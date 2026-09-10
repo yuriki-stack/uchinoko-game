@@ -1,70 +1,75 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="description" content="うちの猫ゲーム ～まったり大冒険～">
-  <title>うちの猫ゲーム ～まったり大冒険～</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="description" content="うちの猫ゲーム ～まったり大冒険～ Version 1.1">
+<title>うちの猫ゲーム ～まったり大冒険～</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="app">
-    <header class="topbar">
-      <div class="brand">🐾 うちの猫ゲーム</div>
-      <div class="controls">
-        <button id="soundBtn" class="icon-btn" aria-label="サウンド切替">🔊</button>
-        <button id="pauseBtn" class="icon-btn" aria-label="一時停止">Ⅱ</button>
+<main class="app">
+  <header class="topbar">
+    <div class="brand"><span>🐾</span> うちの猫ゲーム <small>v1.1</small></div>
+    <div class="controls">
+      <button id="soundBtn" class="icon-btn" aria-label="サウンド">🔊</button>
+      <button id="pauseBtn" class="icon-btn" aria-label="一時停止">Ⅱ</button>
+    </div>
+  </header>
+
+  <section class="hud">
+    <div><span>スコア</span><strong id="score">0</strong></div>
+    <div><span>ハイスコア</span><strong id="highScore">0</strong></div>
+    <div><span>ライフ</span><strong id="lives">❤️❤️❤️</strong></div>
+    <div><span>残り時間</span><strong id="time">60</strong></div>
+  </section>
+
+  <section class="game-shell">
+    <canvas id="gameCanvas" width="960" height="540"></canvas>
+
+    <div id="startOverlay" class="overlay">
+      <div class="panel">
+        <div class="hero-cat">🐱</div>
+        <div class="version">VERSION 1.1</div>
+        <h1>うちの猫ゲーム</h1>
+        <p class="subtitle">～ まったり大冒険 ～</p>
+        <p class="hint">うちの猫が、おうちを走り回る！<br>魚やおやつを集めてハイスコアを目指そう。</p>
+        <button id="startBtn" class="main-btn">🐾 ゲームスタート</button>
       </div>
-    </header>
+    </div>
 
-    <section class="hud">
-      <div><span>スコア</span><strong id="score">0</strong></div>
-      <div><span>ハイスコア</span><strong id="highScore">0</strong></div>
-      <div><span>ライフ</span><strong id="lives">❤️❤️❤️</strong></div>
-      <div><span>残り時間</span><strong id="time">60</strong></div>
-    </section>
-
-    <section class="game-shell">
-      <canvas id="gameCanvas" width="960" height="540"></canvas>
-
-      <div id="startOverlay" class="overlay">
-        <div class="panel">
-          <div class="cat-emoji">🐱</div>
-          <h1>うちの猫ゲーム</h1>
-          <p>～ まったり大冒険 ～</p>
-          <p class="hint">写真の猫をモデルにした主人公で<br>魚やおやつを集めよう！</p>
-          <button id="startBtn" class="main-btn">ゲームスタート</button>
-        </div>
+    <div id="pauseOverlay" class="overlay hidden">
+      <div class="panel">
+        <div class="hero-cat">😺</div>
+        <h2>一時停止</h2>
+        <button id="resumeBtn" class="main-btn">ゲーム再開</button>
       </div>
+    </div>
 
-      <div id="pauseOverlay" class="overlay hidden">
-        <div class="panel">
-          <h2>一時停止</h2>
-          <button id="resumeBtn" class="main-btn">ゲーム再開</button>
-        </div>
+    <div id="gameOverOverlay" class="overlay hidden">
+      <div class="panel">
+        <div class="hero-cat">😺</div>
+        <h2 id="resultTitle">おつかれさま！</h2>
+        <p>今回のスコア</p>
+        <div class="final-score" id="finalScore">0</div>
+        <p id="newRecord" class="record hidden">🏆 NEW RECORD!</p>
+        <button id="restartBtn" class="main-btn">もう一度遊ぶ</button>
       </div>
+    </div>
+  </section>
 
-      <div id="gameOverOverlay" class="overlay hidden">
-        <div class="panel">
-          <div class="cat-emoji">😺</div>
-          <h2>おつかれさま！</h2>
-          <p>スコア <strong id="finalScore">0</strong></p>
-          <p id="newRecord" class="record hidden">🏆 NEW RECORD!</p>
-          <button id="restartBtn" class="main-btn">もう一度遊ぶ</button>
-        </div>
-      </div>
-    </section>
+  <section class="mobile-controls">
+    <button id="leftBtn" aria-label="左">◀</button>
+    <button id="dashBtn" aria-label="ダッシュ">🐾</button>
+    <button id="rightBtn" aria-label="右">▶</button>
+  </section>
 
-    <section class="mobile-controls" aria-label="ゲーム操作">
-      <button id="leftBtn">◀</button>
-      <button id="rightBtn">▶</button>
-    </section>
-
-    <section class="instructions">
-      <p><b>PC：</b> ← → キーで移動　　<b>スマホ：</b> 画面下のボタンで移動</p>
-      <p>🐟 +10　🍖 +30　⭐ +100　❤️ ライフ回復　　🧹 障害物に注意！</p>
-    </section>
-  </main>
-  <script src="script.js"></script>
+  <section class="instructions">
+    <p><b>PC：</b> ← → 移動　<b>Shift：</b>ダッシュ　<b>P：</b>一時停止</p>
+    <p><b>スマホ：</b>左右ボタンで移動　🐾ボタン長押しでダッシュ</p>
+    <p>🐟 +10　🍖 +30　⭐ +100　❤️ 回復　🧹 -1ライフ</p>
+  </section>
+</main>
+<script src="script.js"></script>
 </body>
 </html>

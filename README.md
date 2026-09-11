@@ -18,3 +18,7 @@ PC：← → 移動 / Space ジャンプ / Shift ダッシュ / P 一時停止 /
 
 ## GitHub Pages更新
 ZIPを解凍し、index.html、style.css、script.js、README.md、images/cat.pngをGitHubリポジトリへ上書きしてください。
+
+
+## 修正版
+ゲーム開始ボタンが動かない原因だったステージ表示IDの不一致を修正しました。

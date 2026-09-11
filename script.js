@@ -1,6 +1,6 @@
 const canvas=document.getElementById("game"),ctx=canvas.getContext("2d"),W=canvas.width,H=canvas.height,ground=455;
 const $=id=>document.getElementById(id),catImg=new Image();catImg.src="images/cat.png";
-const ui={score:$("score"),best:$("best"),level:$("level"),lives:$("lives"),progress:$("progress"),combo:$("combo"),stage:$("stage"),fish:$("fish"),snack:$("snack"),star:$("star"),speed:$("speed"),jumpPower:$("jumpPower"),dashPower:$("dashPower"),nextExp:$("nextExp"),missionText:$("missionText"),missionStatus:$("missionStatus"),abilityText:$("abilityText")};
+const ui={score:$("score"),best:$("best"),level:$("level"),lives:$("lives"),progress:$("progress"),combo:$("combo"),stage:$("stageLabel"),fish:$("fish"),snack:$("snack"),star:$("star"),speed:$("speed"),jumpPower:$("jumpPower"),dashPower:$("dashPower"),nextExp:$("nextExp"),missionText:$("missionText"),missionStatus:$("missionStatus"),abilityText:$("abilityText")};
 let keys={},running=false,paused=false,last=0,score=0,best=+localStorage.getItem("uchinokoBest")||0,level=1,exp=0,lives=3,world=0,combo=0,comboTimer=0,stage=1,notice="",noticeTime=0,shake=0;
 let collection={fish:0,snack:0,star:0},ability={name:"なし",time:0,shield:0},mission,items=[],obstacles=[],enemies=[],boss=null,goalX=900;
 const p={x:90,y:390,w:54,h:54,vy:0,onGround:false,face:1};

@@ -1,7 +1,20 @@
 # うちの猫ゲーム Version 1.6
 
-追加：ステージ2「夜の庭」、ステージ選択、動く敵、敵踏みつけ、ボス戦、ボスHP、夜背景。
+## 今回の追加内容
+- ステージ1「うちのおうち」
+- ステージ2「夜の庭」
+- ステージ選択
+- 動く敵キャラクター
+- 敵を上から踏んで撃破
+- ステージ2のボス戦
+- ボスHPゲージ
+- ボスを3回踏んで撃破
+- ボス撃破後のゴール
+- ミッション、コンボ、レベル、能力、コレクションを継承
 
-操作：←→移動 / Spaceジャンプ / Shiftダッシュ / P一時停止 / C図鑑。
+## 操作
+PC：← → 移動 / Space ジャンプ / Shift ダッシュ / P 一時停止 / C 図鑑
+スマートフォン：画面下の操作ボタン
 
-GitHub Pagesでは、index.html、style.css、script.js、images/cat.png、README.mdを上書きしてください。
+## GitHub Pages更新
+ZIPを解凍し、index.html、style.css、script.js、README.md、images/cat.pngをGitHubリポジトリへ上書きしてください。

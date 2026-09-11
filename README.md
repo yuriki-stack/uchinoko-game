@@ -1,5 +1,7 @@
-# うちの猫ゲーム Version 1.4「猫の能力・コレクション」
+# うちの猫ゲーム Version 1.6
 
-Version 1.3をベースに、魚・おやつ・星の収集、経験値、レベルアップ、能力上昇、ベストスコア保存を追加したバージョンです。
+追加：ステージ2「夜の庭」、ステージ選択、動く敵、敵踏みつけ、ボス戦、ボスHP、夜背景。
 
-操作：←→移動 / Spaceジャンプ / Shiftダッシュ / P一時停止 / Cコレクション
+操作：←→移動 / Spaceジャンプ / Shiftダッシュ / P一時停止 / C図鑑。
+
+GitHub Pagesでは、index.html、style.css、script.js、images/cat.png、README.mdを上書きしてください。

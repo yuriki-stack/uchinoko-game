@@ -23,3 +23,5 @@ footer{text-align:center;font-size:12px;opacity:.62;padding:3px 8px 10px}
 @media(max-width:600px){body{padding:8px}.hud{padding:8px 10px}.brand{font-size:15px}.brand span{display:none}.stats{gap:8px;font-size:12px}.controls{gap:6px}.controls button{height:48px;min-width:62px}.controls #jumpBtn{min-width:120px}.panel{padding:20px}footer{font-size:10px}}
 
 .mission,.abilitybar{max-width:960px;margin:10px auto;padding:10px 14px;background:#fffaf4;border:2px solid #dfc9b2;border-radius:12px;box-shadow:0 3px 0 #d4b99d;display:flex;gap:14px;align-items:center;justify-content:center;flex-wrap:wrap}.mission b,.abilitybar b{color:#8c5737}.mission span:last-child{font-weight:700;color:#b65e35}.abilitybar{background:#fff2c9}
+
+.stage-select{max-width:960px;margin:10px auto;padding:10px;background:#fffaf4;border:2px solid #dfc9b2;border-radius:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}.stage-select button{border:0;border-radius:9px;background:#8c6bb1;color:#fff;padding:8px 13px;font-weight:700;cursor:pointer}

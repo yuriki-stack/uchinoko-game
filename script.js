@@ -1,103 +1,27 @@
-const canvas=document.getElementById("game"),ctx=canvas.getContext("2d");
-const W=canvas.width,H=canvas.height,ground=455;
-const ui={score:byId("score"),best:byId("best"),level:byId("level"),lives:byId("lives"),progress:byId("progress"),combo:byId("combo"),fish:byId("fish"),snack:byId("snack"),star:byId("star"),speed:byId("speed"),jumpPower:byId("jumpPower"),dashPower:byId("dashPower"),nextExp:byId("nextExp"),missionText:byId("missionText"),missionStatus:byId("missionStatus"),abilityText:byId("abilityText")};
-const catImg=new Image();catImg.src="images/cat.png";
-let keys={},running=false,paused=false,last=0,score=0,best=Number(localStorage.getItem("uchinokoBest")||0);
-let level=1,exp=0,lives=3,world=0,shake=0,notice="",noticeTime=0,combo=0,comboTimer=0;
-let collection={fish:0,snack:0,star:0},ability={name:"なし",time:0,shield:0};
-let mission={type:"fish",target:3,reward:100,done:false};
-const player={x:90,y:390,w:54,h:54,vy:0,onGround:false,face:1};
-let items=[],obstacles=[],goalX=900;
-function byId(x){return document.getElementById(x)}
-function reset(){
- score=0;level=1;exp=0;lives=3;world=0;combo=0;comboTimer=0;ability={name:"なし",time:0,shield:0};
- collection={fish:0,snack:0,star:0};mission={type:["fish","combo","star"][Math.floor(Math.random()*3)],target:3,reward:100,done:false};
- if(mission.type==="combo"){mission.target=5;mission.reward=150}
- if(mission.type==="star"){mission.target=1;mission.reward=200}
- player.x=90;player.y=390;player.vy=0;
- items=[
-  ...[180,310,470,650].map((x,i)=>({x,y:360-(i%2)*65,r:14,type:"fish",value:10,got:false})),
-  ...[250,550,760].map(x=>({x,y:300,r:16,type:"snack",value:30,got:false})),
-  ...[400,720].map(x=>({x,y:220,r:18,type:"star",value:100,got:false}))
- ];
- obstacles=[{x:350,y:421,w:70,h:34},{x:590,y:421,w:80,h:34},{x:800,y:421,w:55,h:34}];
- updateUI();
-}
-function updateUI(){
- ui.score.textContent=score;ui.best.textContent=best;ui.level.textContent=level;ui.lives.textContent=lives;ui.combo.textContent=combo;
- ui.progress.textContent=Math.min(100,Math.floor(player.x/goalX*100))+"%";
- ui.fish.textContent=collection.fish;ui.snack.textContent=collection.snack;ui.star.textContent=collection.star;
- ui.speed.textContent=(1+(level-1)*.18).toFixed(2);ui.jumpPower.textContent=(1+(level-1)*.22).toFixed(2);ui.dashPower.textContent=(1+(level-1)*.28).toFixed(2);
- ui.nextExp.textContent=(50-exp%50)+"pt";ui.abilityText.textContent=ability.name+(ability.time>0?" ("+Math.ceil(ability.time/60)+"秒)":"");
- let label=mission.type==="fish"?"魚を"+mission.target+"個集める":mission.type==="combo"?"コンボを"+mission.target+"までつなぐ":"星を"+mission.target+"個集める";
- let progress=mission.type==="fish"?collection.fish:mission.type==="combo"?combo:collection.star;
- ui.missionText.textContent=label+"（報酬 "+mission.reward+"pt）";ui.missionStatus.textContent=mission.done?"達成！":progress+"/"+mission.target;
-}
-function addScore(n){score+=n;if(score>best){best=score;localStorage.setItem("uchinokoBest",best)}}
-function levelUp(){level++;notice="レベルアップ！能力が上がった！";noticeTime=110}
-function collect(it){
- it.got=true;combo++;comboTimer=180;
- let multiplier=combo>=10?5:combo>=5?3:combo>=3?2:1;
- addScore(it.value*multiplier);collection[it.type]++;exp+=it.value;
- if(it.type==="star"&&Math.random()<.45)activate("🐾 猫ダッシュ",300);
- if(it.type==="snack"&&Math.random()<.35)activate("🍖 おやつ2倍",360);
- if(combo>=5&&Math.random()<.25)activate("🧲 お魚 magnet",300);
- while(exp>=50){exp-=50;levelUp()}
- checkMission();
- notice=(multiplier>1?"COMBO x"+multiplier+"! ":"")+(it.type==="fish"?"🐟 +"+it.value:it.type==="snack"?"🍪 +"+it.value:"⭐ +"+it.value);noticeTime=65;updateUI();
-}
-function checkMission(){
- let progress=mission.type==="fish"?collection.fish:mission.type==="combo"?combo:collection.star;
- if(!mission.done&&progress>=mission.target){mission.done=true;addScore(mission.reward);exp+=mission.reward;notice="ミッション達成！ +"+mission.reward+"pt";noticeTime=120;while(exp>=50){exp-=50;levelUp()}}
-}
-function activate(name,time){ability.name=name;ability.time=time;if(name.includes("バリア"))ability.shield=1}
-function start(){reset();running=true;paused=false;hideOverlay();last=performance.now();requestAnimationFrame(loop)}
-function showOverlay(title,text,button="もう一度遊ぶ"){byId("overlayTitle").textContent=title;byId("overlayText").textContent=text;byId("startBtn").textContent=button;byId("overlay").style.display="flex"}
-function hideOverlay(){byId("overlay").style.display="none"}
-function gameOver(){running=false;showOverlay("ゲームオーバー","スコア："+score+" / コンボ："+combo+" / コレクション："+(collection.fish+collection.snack+collection.star)+"個")}
-function clearGame(){running=false;showOverlay("ステージクリア！","スコア："+score+" / レベル："+level+" / ミッション："+(mission.done?"達成":"未達成")+" / アイテム："+(collection.fish+collection.snack+collection.star)+"個")}
-function jump(){if(player.onGround){player.vy=-(10.5+(level-1)*.22);player.onGround=false}}
-function togglePause(){if(!running)return;paused=!paused;notice=paused?"一時停止中":"再開";noticeTime=50}
-function update(dt){
- if(paused)return;
- if(comboTimer>0)comboTimer-=dt;else combo=0;
- if(ability.time>0)ability.time-=dt;else ability.name="なし";
- const speed=3.1+(level-1)*.18;
- let dir=(keys.ArrowRight||keys.right?1:0)-(keys.ArrowLeft||keys.left?1:0);
- const dash=keys.Shift||keys.dash;
- let abilityBoost=ability.name.includes("猫ダッシュ")?1.7:1;
- player.vx=dir*speed*(dash?1.8+(level-1)*.28:1)*abilityBoost;
- if(dir)player.face=dir;
- if((keys[" "]||keys.jump)&&player.onGround){jump();keys[" "]=false;keys.jump=false}
- player.x+=player.vx*dt;player.x=Math.max(20,Math.min(goalX,player.x));
- player.vy+=.52*dt;player.y+=player.vy*dt;
- if(player.y+player.h>=ground){player.y=ground-player.h;player.vy=0;player.onGround=true}
- for(const it of items)if(!it.got&&Math.hypot(player.x+player.w/2-it.x,player.y+player.h/2-it.y)<35)collect(it);
- for(const o of obstacles){
-  if(player.x+player.w-8>o.x&&player.x+8<o.x+o.w&&player.y+player.h>o.y+4&&player.y<o.y+o.h){
-   if(ability.name.includes("バリア")&&ability.shield){ability.shield=0;ability.name="なし";notice="バリアで防いだ！";noticeTime=70;player.x=Math.max(30,player.x-25)}
-   else{lives--;combo=0;player.x=Math.max(30,player.x-55);player.vy=-5;shake=10;notice="ぶつかった！";noticeTime=45;if(lives<=0)gameOver()}
-   updateUI();
-  }
- }
- world+=dt;shake=Math.max(0,shake-dt);noticeTime=Math.max(0,noticeTime-dt);updateUI();
- if(player.x>=goalX-20)clearGame();
-}
-function draw(){
- ctx.save();if(shake)ctx.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);
- const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,"#a9ddff");g.addColorStop(1,"#fff1cf");ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
- ctx.fillStyle="#f7d7a7";ctx.fillRect(0,ground,W,H-ground);ctx.fillStyle="#d49a62";for(let x=0;x<W;x+=70)ctx.fillRect(x,ground,2,H-ground);
- ctx.fillStyle="#8bcf7a";ctx.beginPath();ctx.arc(120,ground,90,Math.PI,2*Math.PI);ctx.arc(270,ground,120,Math.PI,2*Math.PI);ctx.fill();
- ctx.fillStyle="#9d6b45";ctx.fillRect(goalX,300,48,155);ctx.fillStyle="#f4c56e";ctx.fillRect(goalX+8,315,32,140);ctx.fillStyle="#6e4b35";ctx.beginPath();ctx.arc(goalX+33,385,4,0,7);ctx.fill();
- for(const o of obstacles){ctx.fillStyle="#777";ctx.fillRect(o.x,o.y,o.w,o.h);ctx.fillStyle="#c9e6ff";ctx.fillRect(o.x+8,o.y+7,o.w-16,9);ctx.fillStyle="#444";ctx.fillRect(o.x+10,o.y+o.h-5,10,5);ctx.fillRect(o.x+o.w-20,o.y+o.h-5,10,5)}
- for(const it of items)if(!it.got){ctx.save();ctx.translate(it.x,it.y+Math.sin(world/12+it.x)*4);ctx.rotate(Math.sin(world/18+it.x)*.1);ctx.font=(it.r*2)+"px serif";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(it.type==="fish"?"🐟":it.type==="snack"?"🍪":"⭐",0,0);ctx.restore()}
- ctx.save();ctx.translate(player.x+player.w/2,player.y+player.h/2);ctx.scale(player.face,1);if(catImg.complete&&catImg.naturalWidth)ctx.drawImage(catImg,-player.w/2,-player.h/2,player.w,player.h);else{ctx.font="48px serif";ctx.textAlign="center";ctx.fillText("🐱",0,12)}ctx.restore();
- if(noticeTime>0){ctx.fillStyle="rgba(73,59,50,.85)";ctx.font="bold 24px sans-serif";ctx.textAlign="center";ctx.fillText(notice,W/2,70)}
- ctx.restore();
-}
-function loop(t){if(!running)return;const dt=Math.min(2,(t-last)/16.67);last=t;update(dt);draw();requestAnimationFrame(loop)}
-window.addEventListener("keydown",e=>{keys[e.key]=true;if(e.key==="p"||e.key==="P")togglePause();if(e.key==="c"||e.key==="C"){notice="図鑑：🐟"+collection.fish+" 🍪"+collection.snack+" ⭐"+collection.star;noticeTime=100}if(["ArrowLeft","ArrowRight"," ","Shift"].includes(e.key))e.preventDefault()});
-window.addEventListener("keyup",e=>keys[e.key]=false);
-document.querySelectorAll("[data-key]").forEach(b=>{const k=b.dataset.key;b.addEventListener("pointerdown",()=>{keys[k]=true;if(k==="jump")jump()});["pointerup","pointerleave","pointercancel"].forEach(ev=>b.addEventListener(ev,()=>keys[k]=false))});
-byId("startBtn").onclick=start;byId("pauseBtn").onclick=togglePause;byId("collectionBtn").onclick=()=>{notice="図鑑：🐟"+collection.fish+" 🍪"+collection.snack+" ⭐"+collection.star;noticeTime=100};
-reset();draw();
+const canvas=document.getElementById("game"),ctx=canvas.getContext("2d"),W=canvas.width,H=canvas.height,ground=455;
+const $=id=>document.getElementById(id),catImg=new Image();catImg.src="images/cat.png";
+const ui={score:$("score"),best:$("best"),level:$("level"),lives:$("lives"),progress:$("progress"),combo:$("combo"),stage:$("stage"),fish:$("fish"),snack:$("snack"),star:$("star"),speed:$("speed"),jumpPower:$("jumpPower"),dashPower:$("dashPower"),nextExp:$("nextExp"),missionText:$("missionText"),missionStatus:$("missionStatus"),abilityText:$("abilityText")};
+let keys={},running=false,paused=false,last=0,score=0,best=+localStorage.getItem("uchinokoBest")||0,level=1,exp=0,lives=3,world=0,combo=0,comboTimer=0,stage=1,notice="",noticeTime=0,shake=0;
+let collection={fish:0,snack:0,star:0},ability={name:"なし",time:0,shield:0},mission,items=[],obstacles=[],enemies=[],boss=null,goalX=900;
+const p={x:90,y:390,w:54,h:54,vy:0,onGround:false,face:1};
+function missionNew(){mission={type:["fish","combo","star"][Math.floor(Math.random()*3)],target:3,reward:100,done:false};if(mission.type==="combo"){mission.target=5;mission.reward=150}if(mission.type==="star"){mission.target=1;mission.reward=200}}
+function reset(s=stage){stage=s;score=0;level=1;exp=0;lives=3;combo=0;comboTimer=0;ability={name:"なし",time:0,shield:0};collection={fish:0,snack:0,star:0};missionNew();p.x=90;p.y=390;p.vy=0;boss=null;
+ if(stage===1){items=[...[180,310,470,650].map((x,i)=>({x,y:360-(i%2)*65,r:14,type:"fish",value:10,got:false})),...[250,550,760].map(x=>({x,y:300,r:16,type:"snack",value:30,got:false})),...[400,720].map(x=>({x,y:220,r:18,type:"star",value:100,got:false}))];obstacles=[{x:350,y:421,w:70,h:34},{x:590,y:421,w:80,h:34},{x:800,y:421,w:55,h:34}];enemies=[];goalX=900}
+ else{items=[...[150,280,430,580,730].map((x,i)=>({x,y:330-(i%2)*70,r:14,type:"fish",value:15,got:false})),...[220,500,780].map(x=>({x,y:250,r:16,type:"snack",value:40,got:false})),...[350,650].map(x=>({x,y:170,r:18,type:"star",value:120,got:false}))];obstacles=[{x:300,y:421,w:65,h:34},{x:520,y:421,w:70,h:34},{x:760,y:421,w:60,h:34}];enemies=[{x:390,y:405,w:38,h:38,vx:1.1,alive:true},{x:680,y:405,w:38,h:38,vx:-1.2,alive:true}];goalX=840;boss={x:900,y:365,w:70,h:90,hp:3,maxHp:3,vx:-.8,active:true}}updateUI()}
+function updateUI(){ui.score.textContent=score;ui.best.textContent=best;ui.level.textContent=level;ui.lives.textContent=lives;ui.combo.textContent=combo;ui.stage.textContent=stage;ui.progress.textContent=Math.min(100,Math.floor(p.x/(stage===2?goalX+90:goalX)*100))+"%";ui.fish.textContent=collection.fish;ui.snack.textContent=collection.snack;ui.star.textContent=collection.star;ui.speed.textContent=(1+(level-1)*.18).toFixed(2);ui.jumpPower.textContent=(1+(level-1)*.22).toFixed(2);ui.dashPower.textContent=(1+(level-1)*.28).toFixed(2);ui.nextExp.textContent=(50-exp%50)+"pt";ui.abilityText.textContent=ability.name+(ability.time>0?" ("+Math.ceil(ability.time/60)+"秒)":"");let t=mission.type==="fish"?"魚を3個集める":mission.type==="combo"?"コンボを5までつなぐ":"星を1個集める";let n=mission.type==="fish"?collection.fish:mission.type==="combo"?combo:collection.star;ui.missionText.textContent=t+"（報酬 "+mission.reward+"pt）";ui.missionStatus.textContent=mission.done?"達成！":n+"/"+mission.target}
+function add(n){score+=n;if(score>best){best=score;localStorage.setItem("uchinokoBest",best)}}
+function levelUp(){level++;notice="レベルアップ！";noticeTime=90}
+function activate(n,t){ability.name=n;ability.time=t}
+function collect(i){i.got=true;combo++;comboTimer=180;let m=combo>=10?5:combo>=5?3:combo>=3?2:1;add(i.value*m);collection[i.type]++;exp+=i.value;if(i.type==="star"&&Math.random()<.5)activate("🐾 猫ダッシュ",300);if(i.type==="snack"&&Math.random()<.4)activate("🍖 おやつ2倍",360);while(exp>=50){exp-=50;levelUp()}let n=mission.type==="fish"?collection.fish:mission.type==="combo"?combo:collection.star;if(!mission.done&&n>=mission.target){mission.done=true;add(mission.reward);exp+=mission.reward;notice="ミッション達成！ +"+mission.reward;noticeTime=120;while(exp>=50){exp-=50;levelUp()}}notice=(m>1?"COMBO x"+m+"! ":"")+(i.type==="fish"?"🐟":i.type==="snack"?"🍪":"⭐")+" +"+i.value;noticeTime=65;updateUI()}
+function damage(){lives--;combo=0;p.x=Math.max(30,p.x-55);p.vy=-5;shake=10;notice="ダメージ！";noticeTime=45;if(lives<=0)over()}
+function over(){running=false;show("ゲームオーバー","ステージ"+stage+" / スコア："+score+" / アイテム："+(collection.fish+collection.snack+collection.star)+"個")}
+function clear(){running=false;show("ステージ"+stage+" クリア！","スコア："+score+" / レベル："+level+" / ミッション："+(mission.done?"達成":"未達成"))}
+function show(t,x,b="もう一度遊ぶ"){$("overlayTitle").textContent=t;$("overlayText").textContent=x;$("startBtn").textContent=b;$("overlay").style.display="flex"}function hide(){$("overlay").style.display="none"}
+function jump(){if(p.onGround){p.vy=-(10.5+(level-1)*.22);p.onGround=false}}
+function update(dt){if(paused)return;if(comboTimer>0)comboTimer-=dt;else combo=0;if(ability.time>0)ability.time-=dt;else ability.name="なし";let dir=(keys.ArrowRight||keys.right?1:0)-(keys.ArrowLeft||keys.left?1:0),dash=keys.Shift||keys.dash,boost=ability.name.includes("猫ダッシュ")?1.7:1;p.vx=dir*(3.1+(level-1)*.18)*(dash?1.8+(level-1)*.28:1)*boost;if(dir)p.face=dir;if((keys[" "]||keys.jump)&&p.onGround){jump();keys[" "]=false;keys.jump=false}p.x=Math.max(20,Math.min(stage===2?goalX+90:goalX,p.x+p.vx*dt));p.vy+=.52*dt;p.y+=p.vy*dt;if(p.y+p.h>=ground){p.y=ground-p.h;p.vy=0;p.onGround=true}
+ for(const i of items)if(!i.got&&Math.hypot(p.x+p.w/2-i.x,p.y+p.h/2-i.y)<35)collect(i);for(const o of obstacles)if(p.x+p.w-8>o.x&&p.x+8<o.x+o.w&&p.y+p.h>o.y+4&&p.y<o.y+o.h){damage();break}
+ for(const e of enemies)if(e.alive){e.x+=e.vx*dt;if(e.x<100||e.x>780)e.vx*=-1;if(p.x+p.w-8>e.x&&p.x+8<e.x+e.w&&p.y+p.h>e.y+4&&p.y<e.y+e.h){if(p.vy>1&&p.y+p.h<e.y+18){e.alive=false;p.vy=-7;add(80)}else damage()}}
+ if(stage===2&&boss&&boss.active){boss.x+=boss.vx*dt;if(boss.x<700||boss.x>900)boss.vx*=-1;if(p.x+p.w>boss.x&&p.x<boss.x+boss.w&&p.y+p.h>boss.y&&p.y<boss.y+boss.h){if(p.vy>1&&p.y+p.h<boss.y+20){boss.hp--;p.vy=-8;add(200);if(boss.hp<=0){boss.active=false;goalX=940;notice="ボス撃破！ゴールへ！";noticeTime=120}}else damage()}}world+=dt;shake=Math.max(0,shake-dt);noticeTime=Math.max(0,noticeTime-dt);updateUI();if(stage===1&&p.x>=goalX-20)clear();if(stage===2&&boss&&!boss.active&&p.x>=goalX-20)clear()}
+function draw(){ctx.save();if(shake)ctx.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);let g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,stage===1?"#a9ddff":"#20264f");g.addColorStop(1,stage===1?"#fff1cf":"#6d5a8b");ctx.fillStyle=g;ctx.fillRect(0,0,W,H);ctx.fillStyle=stage===1?"#f7d7a7":"#27304f";ctx.fillRect(0,ground,W,H-ground);ctx.fillStyle="#9d6b45";ctx.fillRect(goalX,300,48,155);ctx.fillStyle="#f4c56e";ctx.fillRect(goalX+8,315,32,140);for(const o of obstacles){ctx.fillStyle="#777";ctx.fillRect(o.x,o.y,o.w,o.h)}for(const e of enemies)if(e.alive){ctx.fillStyle="#9b4d7b";ctx.beginPath();ctx.arc(e.x+19,e.y+19,19,0,7);ctx.fill()}for(const i of items)if(!i.got){ctx.font=(i.r*2)+"px serif";ctx.textAlign="center";ctx.fillText(i.type==="fish"?"🐟":i.type==="snack"?"🍪":"⭐",i.x,i.y+Math.sin(world/12+i.x)*4)}if(stage===2&&boss&&boss.active){ctx.fillStyle="#6e3e91";ctx.fillRect(boss.x,boss.y,boss.w,boss.h);ctx.fillStyle="#e85b6a";ctx.fillRect(boss.x,boss.y-15,boss.w*(boss.hp/boss.maxHp),7)}ctx.save();ctx.translate(p.x+p.w/2,p.y+p.h/2);ctx.scale(p.face,1);if(catImg.complete&&catImg.naturalWidth)ctx.drawImage(catImg,-p.w/2,-p.h/2,p.w,p.h);else{ctx.font="48px serif";ctx.fillText("🐱",0,12)}ctx.restore();if(noticeTime>0){ctx.fillStyle="rgba(73,59,50,.85)";ctx.font="bold 24px sans-serif";ctx.textAlign="center";ctx.fillText(notice,W/2,70)}ctx.restore()}
+function loop(t){if(!running)return;let dt=Math.min(2,(t-last)/16.67);last=t;update(dt);draw();requestAnimationFrame(loop)}
+window.addEventListener("keydown",e=>{keys[e.key]=true;if(e.key==="p"||e.key==="P")paused=!paused;if(e.key==="c"||e.key==="C"){notice="図鑑：🐟"+collection.fish+" 🍪"+collection.snack+" ⭐"+collection.star;noticeTime=100}if(["ArrowLeft","ArrowRight"," ","Shift"].includes(e.key))e.preventDefault()});window.addEventListener("keyup",e=>keys[e.key]=false);document.querySelectorAll("[data-key]").forEach(b=>{let k=b.dataset.key;b.addEventListener("pointerdown",()=>{keys[k]=true;if(k==="jump")jump()});["pointerup","pointerleave","pointercancel"].forEach(ev=>b.addEventListener(ev,()=>keys[k]=false))});$("startBtn").onclick=()=>{reset(stage);running=true;hide();last=performance.now();requestAnimationFrame(loop)};$("pauseBtn").onclick=()=>paused=!paused;$("collectionBtn").onclick=()=>{notice="図鑑：🐟"+collection.fish+" 🍪"+collection.snack+" ⭐"+collection.star;noticeTime=100};$("stage1Btn").onclick=()=>{reset(1);show("ステージ1：うちのおうち","昼のおうちを冒険しよう！","スタート")};$("stage2Btn").onclick=()=>{reset(2);show("ステージ2：夜の庭","敵とボスを攻略しよう！","スタート")};reset(1);draw();

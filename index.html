@@ -16,6 +16,7 @@
       <div>🏠 <b id="progress">0%</b></div>
     </div>
   </header>
+<div id="abilityPanel" style="padding:8px;text-align:center;background:#fff4df;border-radius:10px;margin:8px 0;font-weight:bold">🐟 0　🍪 0　⭐ 0　｜ Lv.1　｜ 能力：移動1.00 / ジャンプ1.00 / ダッシュ1.00</div>
 
   <main class="stage-wrap">
     <canvas id="game" width="960" height="540" aria-label="うちの猫ゲーム"></canvas>
@@ -70,6 +71,15 @@
     スマホ：画面下のボタン
   </footer>
 </div>
-<script src="script.js"></script>
+<script>
+(function(){
+ const old=window.requestAnimationFrame;
+ let fish=0,snack=0,star=0,level=1,exp=0,best=Number(localStorage.getItem('uchinokoBest')||0);
+ const panel=()=>document.getElementById('abilityPanel');
+ function render(){panel().textContent='🐟 '+fish+'　🍪 '+snack+'　⭐ '+star+'　｜ Lv.'+level+'　｜ 能力：移動'+(1+(level-1)*.18).toFixed(2)+' / ジャンプ'+(1+(level-1)*.22).toFixed(2)+' / ダッシュ'+(1+(level-1)*.28).toFixed(2);}
+ document.addEventListener('keydown',e=>{if(e.key.toLowerCase()==='c'){alert('コレクション\n🐟 魚：'+fish+'\n🍪 おやつ：'+snack+'\n⭐ 星：'+star+'\nベストスコア：'+best);}});
+ window.addEventListener('load',render); setInterval(render,500);
+})();
+</script><script src="script.js"></script>
 </body>
 </html>

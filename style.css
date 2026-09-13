@@ -28,3 +28,5 @@ footer{text-align:center;font-size:12px;opacity:.62;padding:3px 8px 10px}
 .mission{line-height:1.8}.stage-select button{touch-action:manipulation}
 .help-tip{max-width:960px;margin:8px auto;padding:8px 14px;background:#f4ecff;border-radius:10px;text-align:center;font-size:.92rem}.stage-select button{touch-action:manipulation}
 .stage-select button{margin:4px}.overlay .panel{max-width:520px}.controls button{min-width:72px}.mission{line-height:1.8}button{cursor:pointer}button:active{transform:translateY(1px)}
+
+.custom-panel{position:fixed;top:18%;left:50%;transform:translateX(-50%);z-index:20;background:#fff8e8;border:3px solid #8d6748;border-radius:18px;padding:22px;text-align:center;box-shadow:0 10px 35px #0005}.custom-panel button{margin:8px;padding:10px 14px;border:0;border-radius:10px;background:#f1c77b;cursor:pointer}.custom-panel b{display:block;margin-bottom:8px;font-size:20px}

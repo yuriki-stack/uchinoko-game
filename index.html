@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>うちの猫ゲーム - Version 3.1</title>
+<title>うちの猫ゲーム - Version 3.2</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -39,19 +39,23 @@
           <button class="title-stage-card" id="titleStage3" data-title-stage="3"><span class="stage-number">03</span><strong>窓辺</strong><small>光と風の大冒険</small><em>PLAYABLE</em></button>
         </div>
         <button id="startBtn" class="primary-start">ゲームスタート <span>▶</span></button>
-        <div class="title-hint">← → 移動　/　Space ジャンプ　/　Shift ダッシュ</div><div class="title-footer">SAVE DATA AUTO-SAVED　•　VERSION 3.1</div>
+        <div class="title-hint">← → 移動　/　Space ジャンプ　/　Shift ダッシュ</div><div class="title-footer">SAVE DATA AUTO-SAVED　•　VERSION 3.2</div>
       </div>
     </div>
   </main>
   <div class="controls"><button data-key="left">◀</button><button data-key="jump">⬆ ジャンプ</button><button data-key="right">▶</button><button data-key="dash">💨</button><button id="pauseBtn">⏸ 一時停止</button><button id="collectionBtn">📖 図鑑</button><button id="helpBtn">❓ 操作説明</button></div>
   <footer><span id="saveNotice">記録はブラウザに自動保存されます</span><br>PC：← → 移動 / Space ジャンプ / Shift ダッシュ / P 一時停止 / C 図鑑<br>スマホ：画面下のボタン</footer>
 </div>
-<script src="script.js?v=3.1"></script>
+<script src="script.js?v=3.2"></script>
 <script>
 (function(){
   const cards=[...document.querySelectorAll('[data-title-stage]')];
-  const selectStage=(n)=>{cards.forEach(c=>c.classList.toggle('selected',c.dataset.titleStage==n));};
-  cards.forEach(c=>c.addEventListener('click',()=>{const n=Number(c.dataset.titleStage);selectStage(n); if(n===1)document.getElementById('stage1Btn').click(); if(n===2)document.getElementById('stage2Btn').click(); if(n===3)document.getElementById('stage3Btn').click();}));
+  const selectStage=(n)=>cards.forEach(c=>c.classList.toggle('selected',Number(c.dataset.titleStage)===Number(n)));
+  cards.forEach(c=>c.addEventListener('click',()=>{
+    const n=Number(c.dataset.titleStage); selectStage(n);
+    const btn=document.getElementById('stage'+n+'Btn');
+    if(btn) btn.click();
+  }));
   window.addEventListener('uchinoko-stage-selected',e=>selectStage(e.detail));
 })();
 </script>

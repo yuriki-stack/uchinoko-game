@@ -28,7 +28,16 @@ function damage(){if(p.inv>0)return;if(ability.shield){ability.shield=0;ability.
 function over(){checkAchievements();saveStats();running=false;show("ゲームオーバー","ステージ"+stage+" / スコア："+score+" / アイテム："+(collection.fish+collection.snack+collection.star)+"個")}
 function clear(){running=false;const elapsed=(performance.now()-stats.stageStart)/1000;stats.stageBest[stage]=Math.max(stats.stageBest[stage]||0,score);if(stats.stageTime[stage]==null||elapsed<stats.stageTime[stage])stats.stageTime[stage]=elapsed;if(stage===1)stats.achievements.clear1=true;if(stage===2)stats.achievements.clear2=true;if(stats.noDamage)stats.achievements.nodamage=true;checkAchievements();saveStats();show("ステージ"+stage+" クリア！","スコア："+score+" / レベル："+level+" / クリアタイム："+elapsed.toFixed(1)+"秒 / ミッション："+(mission.done?"達成":"未達成"))}
 function beep(freq=440,dur=.06){if(!soundOn)return;try{const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();o.frequency.value=freq;o.connect(g);g.connect(a.destination);g.gain.value=.04;o.start();o.stop(a.currentTime+dur)}catch(e){}}
-function show(t,x,b="もう一度遊ぶ"){$("overlayTitle").textContent=t;$("overlayText").textContent=x;$("startBtn").textContent=b;$("overlay").style.display="flex"}function hide(){$("overlay").style.display="none"}
+function show(t,x,b="もう一度遊ぶ"){
+ const result=/クリア|CLEAR|GAME OVER|ゲームオーバー/.test(t);
+ $("overlayTitle").textContent=t;$("overlayText").textContent=x;$("startBtn").textContent=b;$("overlay").classList.toggle("result-overlay",result);
+ const panel=document.querySelector(".title-panel");
+ let box=document.getElementById("resultStats");
+ if(result){if(!box){box=document.createElement("div");box.id="resultStats";box.className="result-stats";panel.insertBefore(box,$("startBtn"));}
+ const elapsed=stats.stageStart?((performance.now()-stats.stageStart)/1000):0;
+ box.innerHTML=`<div><span>STAGE</span><b>${stage}</b></div><div><span>SCORE</span><b>${score}</b></div><div><span>LEVEL</span><b>${level}</b></div><div><span>ITEMS</span><b>${collection.fish+collection.snack+collection.star}</b></div>`;
+ }else if(box)box.remove();$("overlay").style.display="flex";
+}function hide(){$("overlay").style.display="none"}
 function jump(){if(!running||paused)return;beep(620);if(p.jumps<p.maxJumps){p.vy=-(10.5+(level-1)*.22);p.jumps++;p.onGround=false;notice=p.jumps===2?"二段ジャンプ！":"ジャンプ！";noticeTime=25}}
 function update(dt){if(paused)return;if(p.inv>0)p.inv-=dt;if(comboTimer>0)comboTimer-=dt;else combo=0;if(ability.time>0)ability.time-=dt;else ability.name="なし";let dir=(keys.ArrowRight||keys.right?1:0)-(keys.ArrowLeft||keys.left?1:0),dash=keys.Shift||keys.dash,boost=ability.name.includes("猫ダッシュ")?1.7:1;p.vx=dir*(3.1+(level-1)*.18)*(dash?1.8+(level-1)*.28:1)*boost;if(dir)p.face=dir;p.x=Math.max(20,Math.min(stage===3?goalX+120:stage===2?goalX+90:goalX,p.x+p.vx*dt));p.vy+=.52*dt;p.y+=p.vy*dt;if(p.y+p.h>=ground){p.y=ground-p.h;p.vy=0;p.onGround=true;p.jumps=0}
  for(const pad of jumpPads){if(p.x+p.w>pad.x&&p.x<pad.x+pad.w&&p.y+p.h>=pad.y&&p.y+p.h<=pad.y+24&&p.vy>=0){p.y=pad.y-p.h;p.vy=-pad.power;p.jumps=1;notice="ジャンプ台で大ジャンプ！";noticeTime=45;beep(760)}}

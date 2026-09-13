@@ -26,3 +26,4 @@ footer{text-align:center;font-size:12px;opacity:.62;padding:3px 8px 10px}
 
 .stage-select{max-width:960px;margin:10px auto;padding:10px;background:#fffaf4;border:2px solid #dfc9b2;border-radius:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}.stage-select button{border:0;border-radius:9px;background:#8c6bb1;color:#fff;padding:8px 13px;font-weight:700;cursor:pointer}
 .mission{line-height:1.8}.stage-select button{touch-action:manipulation}
+.help-tip{max-width:960px;margin:8px auto;padding:8px 14px;background:#f4ecff;border-radius:10px;text-align:center;font-size:.92rem}.stage-select button{touch-action:manipulation}

@@ -13,3 +13,18 @@ html,body{overflow-x:hidden}
 
 /* Version 3.6 skill feedback */
 .skill-panel{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;background:linear-gradient(90deg,#edf7ff,#fff,#edf7ff);border:1px solid #9bc8e8;border-radius:14px;padding:10px 14px;box-shadow:0 4px 0 #b7d6e8;font-weight:800}.skill-state{min-width:78px;padding:4px 9px;border-radius:999px;text-align:center;font-size:11px;letter-spacing:.08em;background:#dff6e7;color:#227044}.skill-state.cooldown{background:#ffe6d8;color:#a34d28}.skill-state.active{background:#fff0a8;color:#795500;animation:skillBlink .55s infinite alternate}.skill-panel button{border:0;border-radius:10px;padding:9px 14px;background:#6d8fd1;color:#fff;font-weight:900;cursor:pointer;box-shadow:0 3px 0 #4c6eaf}.skill-panel button:disabled{opacity:.55;cursor:not-allowed}.skill-panel.flash{animation:skillPanelFlash .45s ease}@keyframes skillBlink{from{transform:scale(1)}to{transform:scale(1.08)}}@keyframes skillPanelFlash{0%{box-shadow:0 0 0 0 #f5c84c}100%{box-shadow:0 0 0 12px transparent}}
+
+/* Version 3.8: smartphone touch operation layer */
+html,body{max-width:100%;overflow-x:hidden}body{overscroll-behavior:none}.stage-wrap{position:relative}.touch-controls{display:none;position:absolute;left:10px;right:10px;bottom:12px;z-index:6;justify-content:space-between;align-items:flex-end;pointer-events:none;user-select:none;-webkit-user-select:none}.touch-move,.touch-actions{display:flex;gap:10px;pointer-events:auto}.touch-btn{width:58px;height:58px;border:1px solid rgba(255,255,255,.7);border-radius:18px;background:rgba(55,45,75,.72);color:#fff;font-size:24px;font-weight:900;box-shadow:0 4px 0 rgba(20,15,35,.35);touch-action:none;-webkit-tap-highlight-color:transparent}.touch-btn small{display:block;font-size:9px;line-height:1.1;margin-top:2px}.touch-btn.jump{background:rgba(65,126,183,.82)}.touch-btn.dash{background:rgba(159,91,55,.82)}.touch-btn.skill{background:rgba(103,82,170,.84)}.touch-btn.pressed{transform:translateY(3px);box-shadow:0 1px 0 rgba(20,15,35,.35);filter:brightness(1.25)}
+@media (pointer:coarse),(max-width:700px){
+  .touch-controls{display:flex}
+  .stage-wrap{padding-bottom:0}
+  canvas{touch-action:none;display:block;width:100%;height:auto}
+  .controls{display:none}
+  .skill-panel{gap:7px;padding:8px 9px;font-size:12px}
+  .skill-panel button{padding:8px 10px;font-size:11px}
+  .abilitybar{font-size:10px;line-height:1.7;padding:7px 8px}
+  .mission{font-size:10px;gap:6px;flex-wrap:wrap;padding:7px 8px}
+  footer{padding-bottom:8px}
+}
+@media (max-width:430px){.touch-btn{width:52px;height:52px;border-radius:16px;font-size:21px}.touch-move,.touch-actions{gap:7px}.touch-controls{left:7px;right:7px;bottom:8px}.stats{gap:5px;font-size:11px}.brand{font-size:14px}.skill-panel span:first-child{font-size:11px}}

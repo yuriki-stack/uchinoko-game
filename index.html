@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>うちの猫ゲーム - Version 3.6</title>
+<title>うちの猫ゲーム - Version 3.8</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -18,7 +18,7 @@
   <div class="stage-select">
     <span class="menu-label">WORLD SELECT</span>
     <button id="stage1Btn">01　おうち</button><button id="stage2Btn">02　夜の庭</button><button id="stage3Btn">03　窓辺</button>
-    <button id="resetSaveBtn">記録リセット</button><button id="soundBtn">🔊 効果音ON</button><button id="bgmBtn">🎵 BGM ON</button><button id="customBtn">🎨 猫カスタム</button><button id="recordsBtn">🏆 記録・実績</button>
+    <button id="resetSaveBtn">記録リセット</button><button id="soundBtn">🔊 音ON</button><button id="customBtn">🎨 猫カスタム</button><button id="recordsBtn">🏆 記録・実績</button>
   </div>
   <section class="mission"><b>ミッション</b><span id="missionText">魚を3個集める</span><span id="missionStatus">0/3</span><span>コンボ：<b id="combo">0</b></span><span>次のLvまで：<b id="nextExp">50pt</b></span><span id="abilityText">なし</span></section>
 
@@ -40,14 +40,18 @@
           <button class="title-stage-card" id="titleStage3" data-title-stage="3"><span class="stage-number">03</span><strong>窓辺</strong><small>光と風の大冒険</small><em>PLAYABLE</em></button>
         </div>
         <button id="startBtn" class="primary-start">ゲームスタート <span>▶</span></button>
-        <div class="title-hint">← → 移動　/　Space ジャンプ　/　Shift ダッシュ</div><div class="title-footer">SAVE DATA AUTO-SAVED　•　VERSION 3.7</div>
+        <div class="title-hint">← → 移動　/　Space ジャンプ　/　Shift ダッシュ</div><div class="title-footer">SAVE DATA AUTO-SAVED　•　VERSION 3.8</div>
       </div>
     </div>
   </main>
+  <div id="touchControls" class="touch-controls" aria-label="スマホ操作">
+    <div class="touch-move"><button class="touch-btn" data-touch-key="left" aria-label="左へ移動">◀</button><button class="touch-btn" data-touch-key="right" aria-label="右へ移動">▶</button></div>
+    <div class="touch-actions"><button class="touch-btn jump" data-touch-action="jump">⬆<small>ジャンプ</small></button><button class="touch-btn dash" data-touch-key="dash">💨<small>ダッシュ</small></button><button class="touch-btn skill" data-touch-action="skill">🌀<small>スキル</small></button></div>
+  </div>
   <div class="controls"><button data-key="left">◀</button><button data-key="jump">⬆ ジャンプ</button><button data-key="right">▶</button><button data-key="dash">💨</button><button id="pauseBtn">⏸ 一時停止</button><button id="collectionBtn">📖 図鑑</button><button id="helpBtn">❓ 操作説明</button></div>
   <footer><span id="saveNotice">記録はブラウザに自動保存されます</span><br>PC：← → 移動 / Space ジャンプ / Shift ダッシュ / P 一時停止 / C 図鑑<br>スマホ：画面下のボタン</footer>
 </div>
-<script src="script.js?v=3.7"></script>
+<script src="script.js?v=3.8"></script>
 <script>
 (function(){
   const cards=[...document.querySelectorAll('[data-title-stage]')];

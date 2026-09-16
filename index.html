@@ -17,7 +17,7 @@
 
   <div class="stage-select">
     <span class="menu-label">WORLD SELECT</span>
-    <button id="stage1Btn">01　おうち</button><button id="stage2Btn">02　夜の庭</button><button id="stage3Btn">03　窓辺</button><button id="stage4Btn">04　ねこの庭</button><button id="stage5Btn">05　夜のリビング</button>
+    <button id="stage1Btn">01　おうち</button><button id="stage2Btn">02　夜の庭</button><button id="stage3Btn">03　窓辺</button><button id="stage4Btn">04　ねこの庭</button><button id="stage5Btn">05　夜のリビング</button><button id="stage6Btn">06　おもちゃの迷宮</button>
     <button id="resetSaveBtn">記録リセット</button><button id="soundBtn">🔊 音ON</button><button id="customBtn">🎨 猫カスタム</button><button id="recordsBtn">🏆 記録・実績</button>
   </div>
   <section class="mission"><b>ミッション</b><span id="missionText">魚を3個集める</span><span id="missionStatus">0/3</span><span>コンボ：<b id="combo">0</b></span><span>次のLvまで：<b id="nextExp">50pt</b></span><span id="abilityText">なし</span></section>
@@ -32,15 +32,15 @@
         <div class="title-mark"><span>🐾</span><span>✦</span><span>🐾</span></div>
         <h1 id="overlayTitle">うちの猫ゲーム</h1>
         <div class="title-subtitle">ぼうけんの舞台は、いつものおうち。</div>
-        <p id="overlayText">お気に入りの猫と一緒に、3つのステージを冒険しよう。</p>
+        <p id="overlayText">お気に入りの猫と一緒に、6つのステージを冒険しよう。</p>
         <div class="title-divider"><i></i><span>WORLD SELECT</span><i></i></div>
         <div class="title-stage-grid">
           <button class="title-stage-card selected" id="titleStage1" data-title-stage="1"><span class="stage-number">01</span><strong>おうち</strong><small>昼のリビングを冒険</small><em>PLAYABLE</em></button>
           <button class="title-stage-card" id="titleStage2" data-title-stage="2"><span class="stage-number">02</span><strong>夜の庭</strong><small>月明かりとボス戦</small><em>PLAYABLE</em></button>
-          <button class="title-stage-card" id="titleStage3" data-title-stage="3"><span class="stage-number">03</span><strong>窓辺</strong><small>光と風の大冒険</small><em>PLAYABLE</em></button><button class="title-stage-card" id="titleStage4" data-title-stage="4"><span class="stage-number">04</span><strong>ねこの庭</strong><small>隠し道と自然を探索</small><em>NEW</em></button><button class="title-stage-card" id="titleStage5" data-title-stage="5"><span class="stage-number">05</span><strong>夜のリビング</strong><small>暗闇・ライト・時間制</small><em>NEW</em></button>
+          <button class="title-stage-card" id="titleStage3" data-title-stage="3"><span class="stage-number">03</span><strong>窓辺</strong><small>光と風の大冒険</small><em>PLAYABLE</em></button><button class="title-stage-card" id="titleStage4" data-title-stage="4"><span class="stage-number">04</span><strong>ねこの庭</strong><small>隠し道と自然を探索</small><em>NEW</em></button><button class="title-stage-card" id="titleStage5" data-title-stage="5"><span class="stage-number">05</span><strong>夜のリビング</strong><small>暗闇・ライト・時間制</small><em>NEW</em></button><button class="title-stage-card" id="titleStage6" data-title-stage="6"><span class="stage-number">06</span><strong>おもちゃの迷宮</strong><small>スイッチ・扉・ワープ</small><em>NEW</em></button>
         </div>
         <button id="startBtn" class="primary-start">ゲームスタート <span>▶</span></button>
-        <div class="title-hint">← → 移動　/　Space ジャンプ　/　Shift ダッシュ</div><div class="title-footer">SAVE DATA AUTO-SAVED　•　VERSION 4.1</div>
+        <div class="title-hint">← → 移動　/　Space ジャンプ　/　Shift ダッシュ</div><div class="title-footer">SAVE DATA AUTO-SAVED　•　VERSION 4.3</div>
       </div>
     </div>
   </main>
@@ -51,7 +51,7 @@
   <div class="controls"><button data-key="left">◀</button><button data-key="jump">⬆ ジャンプ</button><button data-key="right">▶</button><button data-key="dash">💨</button><button id="pauseBtn">⏸ 一時停止</button><button id="collectionBtn">📖 図鑑</button><button id="helpBtn">❓ 操作説明</button></div>
   <footer><span id="saveNotice">記録はブラウザに自動保存されます</span><br>PC：← → 移動 / Space ジャンプ / Shift ダッシュ / P 一時停止 / C 図鑑<br>スマホ：画面下のボタン</footer>
 </div>
-<script src="script.js?v=4.2"></script>
+<script src="script.js?v=4.3"></script>
 <script>
 (function(){
   const cards=[...document.querySelectorAll('[data-title-stage]')];

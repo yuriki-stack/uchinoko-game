@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>うちの猫ゲーム - Version 4.6</title>
+<title>うちの猫ゲーム - Version 4.9</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -18,7 +18,7 @@
   <div class="stage-select">
     <span class="menu-label">WORLD SELECT</span>
     <button id="stage1Btn">01　おうち</button><button id="stage2Btn">02　夜の庭</button><button id="stage3Btn">03　窓辺</button><button id="stage4Btn">04　ねこの庭</button><button id="stage5Btn">05　夜のリビング</button><button id="stage6Btn">06　おもちゃの迷宮</button>
-    <button id="resetSaveBtn">記録リセット</button><button id="soundBtn">🔊 音ON</button><button id="customBtn">🎨 猫カスタム</button><button id="recordsBtn">🏆 記録・実績</button>
+    <button id="resetSaveBtn">記録リセット</button><button id="soundBtn">🔊 音ON</button><button id="customBtn">🎨 猫カスタム</button><button id="collectionBookBtn">📚 コレクション</button><button id="recordsBtn">🏆 記録・実績</button>
   </div>
   <section class="mission"><b>ミッション</b><span id="missionText">魚を3個集める</span><span id="missionStatus">0/3</span><span>コンボ：<b id="combo">0</b></span><span>次のLvまで：<b id="nextExp">50pt</b></span><span id="abilityText">なし</span></section>
   <div class="progress-track"><div id="progressFill"></div><span id="progressCaption">冒険の進行度</span></div>
@@ -26,7 +26,7 @@
   <main class="stage-wrap">
     <canvas id="game" width="960" height="540"></canvas>
     <div id="recordsPanel" class="custom-panel records-panel" style="display:none" aria-hidden="true"><b>🏆 やり込み・保存記録</b><div class="record-grid"><div>プレイ回数：<b id="playCount">0</b></div><div>総アイテム：<b id="totalItems">0</b></div><div>ステージ1最高：<b id="stage1Best">0</b>点</div><div>ステージ2最高：<b id="stage2Best">0</b>点</div><div>ステージ1最速：<b id="stage1Time">--</b></div><div>ステージ2最速：<b id="stage2Time">--</b></div><div>ステージ3最高：<b id="stage3Best">0</b>点</div><div>ステージ3最速：<b id="stage3Time">--</b></div><div>ステージ4最高：<b id="stage4Best">0</b>点</div><div>ステージ4最速：<b id="stage4Time">--</b></div><div>ステージ5最高：<b id="stage5Best">0</b>点</div><div>ステージ5最速：<b id="stage5Time">--</b></div><div>ステージ6最高：<b id="stage6Best">0</b>点</div><div>ステージ6最速：<b id="stage6Time">--</b></div><div>実績：<b id="achievementCount">0</b>/6</div></div><div id="achievementList" class="achievement-list"></div><button id="closeRecords">閉じる</button></div>
-    <div id="customPanel" class="custom-panel" style="display:none"><b>猫のカスタマイズ</b><div><button data-skin="normal">通常</button><button data-skin="gold">ゴールド</button><button data-skin="night">夜色</button><button data-skin="ribbon">リボン</button></div><button id="closeCustom">閉じる</button></div>
+    <div id="customPanel" class="custom-panel" style="display:none"><b>猫のカスタマイズ</b><p id="skinHint">成長や収集で衣装が解放されます</p><div><button data-skin="normal">通常</button><button data-skin="gold">ゴールド</button><button data-skin="night">夜色</button><button data-skin="ribbon">リボン</button><button data-skin="royal">王冠</button></div><button id="closeCustom">閉じる</button></div><div id="collectionPanel" class="custom-panel collection-panel" style="display:none"><b>📚 ねこコレクション</b><div id="collectionDetails"></div><button id="closeCollection">閉じる</button></div>
     <div id="overlay" class="overlay">
       <div class="panel title-panel">
         <div class="title-kicker">MY LITTLE ADVENTURE <span class="live-badge">★ PREMIUM EDITION</span></div>
@@ -41,7 +41,7 @@
           <button class="title-stage-card" id="titleStage3" data-title-stage="3"><span class="stage-number">03</span><strong>窓辺</strong><small>光と風の大冒険</small><em>PLAYABLE</em></button><button class="title-stage-card" id="titleStage4" data-title-stage="4"><span class="stage-number">04</span><strong>ねこの庭</strong><small>隠し道と自然を探索</small><em>NEW</em></button><button class="title-stage-card" id="titleStage5" data-title-stage="5"><span class="stage-number">05</span><strong>夜のリビング</strong><small>暗闇・ライト・時間制</small><em>NEW</em></button><button class="title-stage-card" id="titleStage6" data-title-stage="6"><span class="stage-number">06</span><strong>おもちゃの迷宮</strong><small>スイッチ・扉・ワープ</small><em>NEW</em></button>
         </div>
         <button id="startBtn" class="primary-start">ゲームスタート <span>▶</span></button>
-        <div class="title-hint">← → 移動　/　Space ジャンプ　/　Shift ダッシュ</div><div class="title-footer">SAVE DATA AUTO-SAVED　•　VERSION 4.6</div>
+        <div class="title-hint">← → 移動　/　Space ジャンプ　/　Shift ダッシュ</div><div class="title-footer">SAVE DATA AUTO-SAVED　•　VERSION 4.9</div>
       </div>
     </div>
   </main>
@@ -52,7 +52,7 @@
   <div class="controls"><button data-key="left">◀</button><button data-key="jump">⬆ ジャンプ</button><button data-key="right">▶</button><button data-key="dash">💨</button><button id="pauseBtn">⏸ 一時停止</button><button id="collectionBtn">📖 図鑑</button><button id="helpBtn">❓ 操作説明</button></div>
   <footer><span id="saveNotice">記録はブラウザに自動保存されます</span><br>PC：← → 移動 / Space ジャンプ / Shift ダッシュ / P 一時停止 / C 図鑑<br>スマホ：画面下のボタン</footer>
 </div>
-<script src="script.js?v=4.5"></script>
+<script src="script.js?v=4.9"></script>
 <script>
 (function(){
   const cards=[...document.querySelectorAll('[data-title-stage]')];

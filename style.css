@@ -36,3 +36,7 @@ html,body{max-width:100%;overflow-x:hidden}body{overscroll-behavior:none}.stage-
 #progressCaption{position:absolute;inset:0;text-align:center;font-size:10px;line-height:12px;color:#fff;text-shadow:0 1px 3px #18213b;letter-spacing:.08em;pointer-events:none}
 .title-panel,.custom-panel,.skill-panel,.mission,.abilitybar{backdrop-filter:blur(8px)}
 @media(max-width:700px){.progress-track{margin:7px 10px 0;height:10px}.progress-track #progressCaption{font-size:9px;line-height:10px}.hud{gap:5px}.stats{font-size:11px}.mission{font-size:11px;gap:5px}}
+
+/* Version 4.7-4.9 collection and unlock UI */
+.custom-panel p{margin:8px 0;font-size:13px;opacity:.85}.custom-panel button:disabled{opacity:.38;cursor:not-allowed;filter:grayscale(1)}
+.collection-panel{max-width:560px;max-height:78vh;overflow:auto}.collection-panel h4{margin:14px 0 7px;border-bottom:1px solid rgba(255,255,255,.2);padding-bottom:5px}.collection-row{display:grid;grid-template-columns:1fr auto auto;gap:12px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.12);font-size:13px}.collection-row small{opacity:.75}.collection-chips{display:flex;flex-wrap:wrap;gap:7px}.collection-chip{padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.12);font-size:12px}.collection-chip.locked{opacity:.45}

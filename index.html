@@ -24,7 +24,7 @@
 
   <main class="stage-wrap">
     <canvas id="game" width="960" height="540"></canvas>
-    <div id="recordsPanel" class="custom-panel records-panel" style="display:none" aria-hidden="true"><b>🏆 やり込み・保存記録</b><div class="record-grid"><div>プレイ回数：<b id="playCount">0</b></div><div>総アイテム：<b id="totalItems">0</b></div><div>ステージ1最高：<b id="stage1Best">0</b>点</div><div>ステージ2最高：<b id="stage2Best">0</b>点</div><div>ステージ1最速：<b id="stage1Time">--</b></div><div>ステージ2最速：<b id="stage2Time">--</b></div><div>ステージ3最高：<b id="stage3Best">0</b>点</div><div>ステージ3最速：<b id="stage3Time">--</b></div><div>実績：<b id="achievementCount">0</b>/6</div></div><div id="achievementList" class="achievement-list"></div><button id="closeRecords">閉じる</button></div>
+    <div id="recordsPanel" class="custom-panel records-panel" style="display:none" aria-hidden="true"><b>🏆 やり込み・保存記録</b><div class="record-grid"><div>プレイ回数：<b id="playCount">0</b></div><div>総アイテム：<b id="totalItems">0</b></div><div>ステージ1最高：<b id="stage1Best">0</b>点</div><div>ステージ2最高：<b id="stage2Best">0</b>点</div><div>ステージ1最速：<b id="stage1Time">--</b></div><div>ステージ2最速：<b id="stage2Time">--</b></div><div>ステージ3最高：<b id="stage3Best">0</b>点</div><div>ステージ3最速：<b id="stage3Time">--</b></div><div>ステージ4最高：<b id="stage4Best">0</b>点</div><div>ステージ4最速：<b id="stage4Time">--</b></div><div>ステージ5最高：<b id="stage5Best">0</b>点</div><div>ステージ5最速：<b id="stage5Time">--</b></div><div>ステージ6最高：<b id="stage6Best">0</b>点</div><div>ステージ6最速：<b id="stage6Time">--</b></div><div>実績：<b id="achievementCount">0</b>/6</div></div><div id="achievementList" class="achievement-list"></div><button id="closeRecords">閉じる</button></div>
     <div id="customPanel" class="custom-panel" style="display:none"><b>猫のカスタマイズ</b><div><button data-skin="normal">通常</button><button data-skin="gold">ゴールド</button><button data-skin="night">夜色</button><button data-skin="ribbon">リボン</button></div><button id="closeCustom">閉じる</button></div>
     <div id="overlay" class="overlay">
       <div class="panel title-panel">
@@ -51,7 +51,7 @@
   <div class="controls"><button data-key="left">◀</button><button data-key="jump">⬆ ジャンプ</button><button data-key="right">▶</button><button data-key="dash">💨</button><button id="pauseBtn">⏸ 一時停止</button><button id="collectionBtn">📖 図鑑</button><button id="helpBtn">❓ 操作説明</button></div>
   <footer><span id="saveNotice">記録はブラウザに自動保存されます</span><br>PC：← → 移動 / Space ジャンプ / Shift ダッシュ / P 一時停止 / C 図鑑<br>スマホ：画面下のボタン</footer>
 </div>
-<script src="script.js?v=4.3"></script>
+<script src="script.js?v=4.4"></script>
 <script>
 (function(){
   const cards=[...document.querySelectorAll('[data-title-stage]')];

@@ -52,11 +52,11 @@ function show(t,x,b="もう一度遊ぶ"){
 function burst(x,y,type="dust",count=8){for(let i=0;i<count;i++)effects.push({x,y,vx:(Math.random()-.5)*3,vy:-Math.random()*2.5-0.5,life:35,max:35,type})}
 function jump(){if(!running||paused)return;beep(620);burst(p.x+p.w/2,p.y+p.h,"dust",10);if(p.jumps<p.maxJumps){p.vy=-(10.5+(level-1)*.22);p.jumps++;p.onGround=false;notice=p.jumps===2?"二段ジャンプ！":"ジャンプ！";noticeTime=25}}
 function update(dt){if(paused)return;if(skillCooldown>0)skillCooldown-=dt;skillGauge=Math.min(100,skillGauge+0.12*dt);if(p.inv>0)p.inv-=dt;if(comboTimer>0)comboTimer-=dt;else combo=0;if(ability.time>0)ability.time-=dt;else ability.name="なし";let dir=(keys.ArrowRight||keys.right?1:0)-(keys.ArrowLeft||keys.left?1:0),dash=keys.Shift||keys.dash,boost=ability.name.includes("猫ダッシュ")?1.7:1;p.vx=dir*(3.1+(level-1)*.18+(growthLevel-1)*.06)*(dash?1.8+(level-1)*.28+(growthLevel-1)*.07:1)*boost;if(dir)p.face=dir;p.x=Math.max(20,Math.min(stage===3?goalX+120:stage===2?goalX+90:stage===5?goalX:stage===6?goalX:goalX,p.x+p.vx*dt));p.vy+=.52*dt;p.y+=p.vy*dt;if(p.y+p.h>=ground){if(!p.onGround&&p.vy>3)burst(p.x+p.w/2,ground,"dust",12);p.y=ground-p.h;p.vy=0;p.onGround=true;p.jumps=0}
-if(stage>=3){const next=Math.min(Math.max(90,goalX-120),Math.floor(p.x/320)*320+90);if(next>checkpointX&&p.x>checkpointX+45){checkpointX=next;checkpointNotice=90;notice="チェックポイント到達！";noticeTime=55;beep(700,.06)}}
+if(stage>=3){let next;if(stage===7){next=p.x<430?90:p.x<800?420:p.x<1110?800:1120;}else if(stage===8){next=p.x<500?90:p.x<900?480:p.x<1280?900:1240;}else{next=Math.min(Math.max(90,goalX-180),Math.floor(p.x/320)*320+90);}if(next>checkpointX&&p.x>checkpointX+45){checkpointX=next;checkpointNotice=90;notice="チェックポイント到達！";noticeTime=55;beep(700,.06)}}
 if(checkpointNotice>0)checkpointNotice-=dt
  for(const pad of jumpPads){if(p.x+p.w>pad.x&&p.x<pad.x+pad.w&&p.y+p.h>=pad.y&&p.y+p.h<=pad.y+24&&p.vy>=0){p.y=pad.y-p.h;p.vy=-pad.power;p.jumps=1;notice="ジャンプ台で大ジャンプ！";noticeTime=45;beep(760)}}
  for(const pl of platforms){if(pl.kind==="moving"){pl.y=pl.baseY+Math.sin(world*pl.speed+pl.phase)*pl.range}if(p.x+p.w-5>pl.x&&p.x+5<pl.x+pl.w&&p.y+p.h>=pl.y&&p.y+p.h<=pl.y+20&&p.vy>=0){p.y=pl.y-p.h;p.vy=0;p.onGround=true;p.jumps=0}}
- for(const i of items)if(!i.got&&Math.hypot(p.x+p.w/2-i.x,p.y+p.h/2-i.y)<35)collect(i);for(const o of obstacles)if(p.x+p.w-8>o.x&&p.x+8<o.x+o.w&&p.y+p.h>o.y+4&&p.y<o.y+o.h){damage();break};if(stage===6){for(const d of doors)if(!d.open&&p.x+p.w-6>d.x&&p.x+6<d.x+d.w&&p.y+p.h>d.y+4&&p.y<d.y+d.h){p.x-=p.vx*dt;p.vx=0;notice="扉が閉まっている！ スイッチを探そう";noticeTime=35}}
+ for(const i of items)if(!i.got&&Math.hypot(p.x+p.w/2-i.x,p.y+p.h/2-i.y)<35)collect(i);for(const o of obstacles)if(stage!==7&&p.x+p.w-8>o.x&&p.x+8<o.x+o.w&&p.y+p.h>o.y+4&&p.y<o.y+o.h){damage();break};if(stage===6){for(const d of doors)if(!d.open&&p.x+p.w-6>d.x&&p.x+6<d.x+d.w&&p.y+p.h>d.y+4&&p.y<d.y+d.h){p.x-=p.vx*dt;p.vx=0;notice="扉が閉まっている！ スイッチを探そう";noticeTime=35}}
  for(const e of enemies)if(e.alive){e.x+=e.vx*dt;if(e.x<100||e.x>780)e.vx*=-1;if(p.x+p.w-8>e.x&&p.x+8<e.x+e.w&&p.y+p.h>e.y+4&&p.y<e.y+e.h){if(p.vy>1&&p.y+p.h<e.y+18){e.alive=false;p.vy=-7;add(80);notice="敵を踏んだ！ +80";noticeTime=50}else damage()}}
  if(stage===2&&boss&&boss.active){boss.x+=boss.vx*dt;if(boss.x<700||boss.x>900)boss.vx*=-1;if(p.x+p.w>boss.x&&p.x<boss.x+boss.w&&p.y+p.h>boss.y&&p.y<boss.y+boss.h){if(p.vy>1&&p.y+p.h<boss.y+20){boss.hp--;p.vy=-8;add(200);notice="ボスに攻撃！";noticeTime=60;if(boss.hp<=0){boss.active=false;goalX=940;notice="ボス撃破！ゴールへ！";noticeTime=120}}else damage()}}if(stage===6){for(const sw of switches){if(!sw.active&&p.x+p.w>sw.x&&p.x<sw.x+34&&p.y+p.h>sw.y&&p.y<sw.y+34){sw.active=true;add(100);notice="スイッチを押した！";noticeTime=50;beep(700)}}for(const d of doors){const sw=switches.find(x=>x.label===d.required);d.open=!!sw?.active}for(const w of warps){if(Math.hypot(p.x+p.w/2-w.x,p.y+p.h/2-w.y)<28){p.x=w.to;notice="ワープした！";noticeTime=45;beep(520)}}}if(stage===5){stage5Timer-=dt;if(stage5Timer<=0)over();}if(stage===3){windTimer-=dt;if(windTimer<=0){wind=wind===0?1:0;windTimer=180;notice=wind?"窓からそよ風！":"風がやんだ！";noticeTime=45}if(wind&&p.y<390)p.x=Math.min(goalX+120,p.x+0.35*dt);if(Math.random()<0.18){particles.push({x:goalX+20+Math.random()*90,y:120+Math.random()*220,vx:-.4,life:100})}}for(const q of particles){q.x+=q.vx*dt;q.life-=dt}particles=particles.filter(q=>q.life>0);for(const e of effects){e.x+=e.vx*dt;e.y+=e.vy*dt;e.vy+=.08*dt;e.life-=dt}effects=effects.filter(e=>e.life>0);world+=dt;shake=Math.max(0,shake-dt);noticeTime=Math.max(0,noticeTime-dt);updateUI();if(stage===1&&p.x>=goalX-20)clear();if(stage===2&&boss&&!boss.active&&p.x>=goalX-20)clear();if((stage===3||stage===4||stage===5||stage===6)&&p.x>=goalX-20)clear()}
 function draw(dt=1){ctx.save();if(shake)ctx.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);let g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,stage===1?"#a9ddff":stage===2?"#20264f":stage===3?"#f6c6d8":stage===5?"#101a3c":stage===6?"#3b2458":"#b8e6a3");g.addColorStop(1,stage===1?"#fff1cf":stage===2?"#6d5a8b":stage===3?"#fff0d5":stage===5?"#34466f":stage===6?"#d28bba":"#e9f7c9");ctx.fillStyle=g;ctx.fillRect(0,0,W,H);ctx.fillStyle=stage===1?"#f7d7a7":stage===2?"#27304f":stage===3?"#d9a77b":stage===5?"#252b4b":stage===6?"#6b3d78":"#79b85b";ctx.fillRect(0,ground,W,H-ground);const worldWidth=stage===6?goalX+180:stage===5?goalX+160:stage===4?goalX+180:stage===3?goalX+140:stage===2?goalX+100:goalX+40;const cameraTarget=Math.max(0,Math.min(Math.max(0,worldWidth-W),p.x-W*.42));cameraX+=(cameraTarget-cameraX)*Math.min(1,.12*dt);if(Math.abs(cameraTarget-cameraX)<.15)cameraX=cameraTarget;ctx.save();ctx.translate(-cameraX,0);if(stage>=3){ctx.fillStyle="rgba(255,255,255,.72)";ctx.fillRect(checkpointX,ground-80,5,80);ctx.font="20px sans-serif";ctx.fillText("🐾",checkpointX-8,ground-88);}
@@ -201,7 +201,55 @@ update=function(dt){
   if(challengeMode?.key==='jumps'&&challengeJumps>challengeDefs.jumps.limit){notice="ジャンプ制限オーバー！";noticeTime=50;}
 };
 const _drawPhase2=draw;
-draw=function(dt=1){_drawPhase2(dt); if(stage===7){ctx.save();ctx.fillStyle='rgba(70,120,170,.18)';for(let x=0;x<W;x+=26){ctx.fillRect(x,0,2,H);ctx.fillRect(x+9,90,2,220)}ctx.fillStyle='rgba(255,255,255,.82)';ctx.font='bold 26px sans-serif';ctx.fillText('☔ 雨の日のベランダ',22,38);ctx.font='16px sans-serif';ctx.fillText('雨宿り・水たまり・風船を使いこなそう',22,62);for(const s of phase2Shelters){ctx.fillStyle='rgba(112,72,48,.92)';ctx.fillRect(s.x,s.y,s.w,18);ctx.fillRect(s.x+12,s.y+18,18,s.h-18);ctx.fillRect(s.x+s.w-30,s.y+18,18,s.h-18);ctx.fillStyle='rgba(210,235,255,.38)';ctx.fillRect(s.x+30,s.y+30,s.w-60,s.h-30);ctx.fillStyle='rgba(255,255,255,.9)';ctx.font='14px sans-serif';ctx.fillText('☂ '+s.label,s.x+38,s.y-8)}for(const q of phase2Puddles){ctx.fillStyle='rgba(70,155,210,.62)';ctx.beginPath();ctx.ellipse(q.x+q.w/2,q.y+12,q.w/2,12,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='rgba(255,255,255,.75)';ctx.beginPath();ctx.ellipse(q.x+q.w*.35,q.y+7,18,4,0,0,Math.PI*2);ctx.fill()}for(const b of phase2Balloons){ctx.fillStyle='rgba(245,120,150,.86)';ctx.beginPath();ctx.arc(b.x,b.y,18,0,Math.PI*2);ctx.fill();ctx.fillStyle='rgba(255,255,255,.75)';ctx.beginPath();ctx.arc(b.x-6,b.y-7,5,0,Math.PI*2);ctx.fill();ctx.strokeStyle='rgba(90,80,80,.7)';ctx.beginPath();ctx.moveTo(b.x,b.y+18);ctx.lineTo(b.x,b.y+55);ctx.stroke()}ctx.fillStyle='rgba(255,255,255,.9)';ctx.font='18px sans-serif';ctx.fillText('☔ 雨音のエリア',W-190,38);ctx.restore();} if(stage===8){ctx.save();ctx.fillStyle='rgba(100,70,45,.20)';ctx.fillRect(0,0,W,85);ctx.strokeStyle='rgba(80,55,40,.55)';ctx.lineWidth=4;for(let x=0;x<W;x+=90){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x+70,85);ctx.stroke()}ctx.fillStyle='rgba(255,245,190,.9)';ctx.font='bold 24px sans-serif';ctx.fillText('🏚 屋根裏の秘密基地',22,38);ctx.font='15px sans-serif';ctx.fillText('梯子で上へ。怪しい壁の奥には秘密の通路がある。',22,62);for(const l of phase2Ladders){ctx.strokeStyle='#9a6b42';ctx.lineWidth=8;ctx.beginPath();ctx.moveTo(l.x+8,l.bottomY);ctx.lineTo(l.x+8,l.topY);ctx.moveTo(l.x+l.w-8,l.bottomY);ctx.lineTo(l.x+l.w-8,l.topY);ctx.stroke();for(let y=l.topY+10;y<l.bottomY;y+=22){ctx.beginPath();ctx.moveTo(l.x+7,y);ctx.lineTo(l.x+l.w-7,y);ctx.stroke()}}for(const z of phase2SecretPassages){ctx.fillStyle=atticSecret?'rgba(255,225,120,.65)':'rgba(70,45,35,.78)';ctx.fillRect(z.x,z.y,z.w,z.h);ctx.fillStyle='#f8e6ad';ctx.font='bold 13px sans-serif';ctx.fillText(atticSecret?'OPEN':'? SECRET ?',z.x+12,z.y+38)}ctx.fillStyle='rgba(255,255,255,.88)';ctx.font='18px sans-serif';ctx.fillText('📦 古い箱と秘密の通路',W-230,38);if(atticSecret){ctx.font='16px sans-serif';ctx.fillText('✨ SECRET ROOM FOUND',W-250,62)}ctx.restore();}};
+draw=function(dt=1){
+  _drawPhase2(dt);
+  // Phase 2 scenery uses world coordinates, so visuals stay aligned with collisions while the camera moves.
+  if(stage===7){
+    ctx.save();
+    ctx.translate(-cameraX,0);
+    ctx.fillStyle='rgba(70,120,170,.18)';
+    const ww=goalX+120;
+    for(let x=0;x<ww;x+=26){ctx.fillRect(x,0,2,H);ctx.fillRect(x+9,90,2,310)}
+    // Rain shelters
+    for(const sh of phase2Shelters){
+      ctx.fillStyle='rgba(112,72,48,.92)';ctx.fillRect(sh.x,sh.y,sh.w,18);ctx.fillRect(sh.x+12,sh.y+18,18,sh.h-18);ctx.fillRect(sh.x+sh.w-30,sh.y+18,18,sh.h-18);
+      ctx.fillStyle='rgba(210,235,255,.38)';ctx.fillRect(sh.x+30,sh.y+30,sh.w-60,sh.h-30);
+      ctx.fillStyle='rgba(255,255,255,.9)';ctx.font='14px sans-serif';ctx.fillText('☂ '+sh.label,sh.x+34,sh.y-8);
+    }
+    // Puddles: the hit area is exactly the visible water surface.
+    for(const q of phase2Puddles){
+      ctx.fillStyle='rgba(70,155,210,.62)';ctx.beginPath();ctx.ellipse(q.x+q.w/2,q.y+q.h/2,q.w/2,q.h/2,0,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,.78)';ctx.beginPath();ctx.ellipse(q.x+q.w*.35,q.y+q.h*.28,18,4,0,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle='rgba(255,255,255,.28)';ctx.beginPath();ctx.ellipse(q.x+q.w/2,q.y+q.h/2,q.w/2-3,q.h/2-3,0,0,Math.PI*2);ctx.stroke();
+    }
+    // Balloons
+    for(const b of phase2Balloons){
+      ctx.fillStyle='rgba(245,120,150,.86)';ctx.beginPath();ctx.arc(b.x,b.y,18,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,.75)';ctx.beginPath();ctx.arc(b.x-6,b.y-7,5,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle='rgba(90,80,80,.7)';ctx.beginPath();ctx.moveTo(b.x,b.y+18);ctx.lineTo(b.x,b.y+55);ctx.stroke();
+    }
+    // Clearly marked goal after the boss.
+    const gx=goalX;
+    ctx.fillStyle='#8b5a35';ctx.fillRect(gx,270,12,185);ctx.fillStyle='#ffd85a';ctx.fillRect(gx+12,278,115,48);
+    ctx.fillStyle='#5a3928';ctx.font='bold 22px sans-serif';ctx.fillText('GOAL',gx+29,310);
+    ctx.fillStyle='#fff';ctx.font='14px sans-serif';ctx.fillText(phase2Boss&&phase2Boss.active?'ボスを止めてゴールへ':'ゴール！',gx+14,350);
+    ctx.fillStyle='rgba(255,255,255,.92)';ctx.font='18px sans-serif';ctx.fillText('☔ 雨の日のベランダ',20,38);
+    ctx.font='14px sans-serif';ctx.fillText('水たまりは見えている場所だけ危険／雨宿り・風船を活用',20,62);
+    ctx.restore();
+    // Screen-space title badge
+    ctx.save();ctx.fillStyle='rgba(40,70,90,.72)';ctx.fillRect(12,12,310,64);ctx.fillStyle='#fff';ctx.font='bold 20px sans-serif';ctx.fillText('☔ 雨の日のベランダ',24,38);ctx.font='13px sans-serif';ctx.fillText('水たまり・風船・雨音のエリア',24,60);ctx.restore();
+  }
+  if(stage===8){
+    ctx.save();ctx.translate(-cameraX,0);
+    ctx.fillStyle='rgba(100,70,45,.20)';ctx.fillRect(0,0,goalX+120,85);
+    ctx.strokeStyle='rgba(80,55,40,.55)';ctx.lineWidth=4;for(let x=0;x<goalX+120;x+=90){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x+70,85);ctx.stroke()}
+    for(const l of phase2Ladders){ctx.strokeStyle='#9a6b42';ctx.lineWidth=8;ctx.beginPath();ctx.moveTo(l.x+8,l.bottomY);ctx.lineTo(l.x+8,l.topY);ctx.moveTo(l.x+l.w-8,l.bottomY);ctx.lineTo(l.x+l.w-8,l.topY);ctx.stroke();for(let y=l.topY+10;y<l.bottomY;y+=22){ctx.beginPath();ctx.moveTo(l.x+7,y);ctx.lineTo(l.x+l.w-7,y);ctx.stroke()}}
+    for(const z of phase2SecretPassages){ctx.fillStyle=atticSecret?'rgba(255,225,120,.65)':'rgba(70,45,35,.78)';ctx.fillRect(z.x,z.y,z.w,z.h);ctx.fillStyle='#f8e6ad';ctx.font='bold 13px sans-serif';ctx.fillText(atticSecret?'OPEN':'? SECRET ?',z.x+12,z.y+38)}
+    const gx=goalX;ctx.fillStyle='#8b5a35';ctx.fillRect(gx,255,12,200);ctx.fillStyle='#ffd85a';ctx.fillRect(gx+12,265,115,48);ctx.fillStyle='#5a3928';ctx.font='bold 22px sans-serif';ctx.fillText('GOAL',gx+29,297);ctx.fillStyle='#fff';ctx.font='14px sans-serif';ctx.fillText(phase2Boss&&phase2Boss.active?'ボスを止めてゴールへ':'ゴール！',gx+14,338);
+    ctx.restore();
+    ctx.save();ctx.fillStyle='rgba(55,40,30,.76)';ctx.fillRect(12,12,350,64);ctx.fillStyle='#fff';ctx.font='bold 20px sans-serif';ctx.fillText('🏚 屋根裏の秘密基地',24,38);ctx.font='13px sans-serif';ctx.fillText('梯子・隠し部屋・秘密の通路を探索',24,60);ctx.restore();
+  }
+};
 // Stage 7/8 buttons
 function phase2Select(n,title,desc){if(!phase2UnlockStage(n)){show('ステージ'+n+' 未解放','解放条件：前のステージをクリアしよう','閉じる');return;}reset(n);window.dispatchEvent(new CustomEvent('uchinoko-stage-selected',{detail:n}));show(title,desc,'スタート');}
 $('stage7Btn').onclick=()=>phase2Select(7,'ステージ7：雨の日のベランダ','雨で滑る床、水たまり、風船、雨の日限定アイテムを攻略しよう！');

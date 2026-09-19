@@ -17,8 +17,8 @@
 
   <div class="stage-select">
     <span class="menu-label">WORLD SELECT</span>
-    <button id="stage1Btn">01　おうち</button><button id="stage2Btn">02　夜の庭</button><button id="stage3Btn">03　窓辺</button><button id="stage4Btn">04　ねこの庭</button><button id="stage5Btn">05　夜のリビング</button><button id="stage6Btn">06　おもちゃの迷宮</button>
-    <button id="resetSaveBtn">記録リセット</button><button id="soundBtn">🔊 音ON</button><button id="customBtn">🎨 猫カスタム</button><button id="collectionBookBtn">📚 コレクション</button><button id="recordsBtn">🏆 記録・実績</button>
+    <button id="stage1Btn">01　おうち</button><button id="stage2Btn">02　夜の庭</button><button id="stage3Btn">03　窓辺</button><button id="stage4Btn">04　ねこの庭</button><button id="stage5Btn">05　夜のリビング</button><button id="stage6Btn">06　おもちゃの迷宮</button><button id="stage7Btn">07　雨のベランダ</button><button id="stage8Btn">08　屋根裏</button>
+    <button id="resetSaveBtn">記録リセット</button><button id="soundBtn">🔊 音ON</button><button id="customBtn">🎨 猫カスタム</button><button id="collectionBookBtn">📚 コレクション</button><button id="challengeBtn">⚡ チャレンジ</button><button id="worldMapBtn">🗺 ワールドマップ</button><button id="recordsBtn">🏆 記録・実績</button>
   </div>
   <section class="mission"><b>ミッション</b><span id="missionText">魚を3個集める</span><span id="missionStatus">0/3</span><span>コンボ：<b id="combo">0</b></span><span>次のLvまで：<b id="nextExp">50pt</b></span><span id="abilityText">なし</span></section>
   <div class="progress-track"><div id="progressFill"></div><span id="progressCaption">冒険の進行度</span></div>
@@ -27,21 +27,24 @@
     <canvas id="game" width="960" height="540"></canvas>
     <div id="recordsPanel" class="custom-panel records-panel" style="display:none" aria-hidden="true"><b>🏆 やり込み・保存記録</b><div class="record-grid"><div>プレイ回数：<b id="playCount">0</b></div><div>総アイテム：<b id="totalItems">0</b></div><div>ステージ1最高：<b id="stage1Best">0</b>点</div><div>ステージ2最高：<b id="stage2Best">0</b>点</div><div>ステージ1最速：<b id="stage1Time">--</b></div><div>ステージ2最速：<b id="stage2Time">--</b></div><div>ステージ3最高：<b id="stage3Best">0</b>点</div><div>ステージ3最速：<b id="stage3Time">--</b></div><div>ステージ4最高：<b id="stage4Best">0</b>点</div><div>ステージ4最速：<b id="stage4Time">--</b></div><div>ステージ5最高：<b id="stage5Best">0</b>点</div><div>ステージ5最速：<b id="stage5Time">--</b></div><div>ステージ6最高：<b id="stage6Best">0</b>点</div><div>ステージ6最速：<b id="stage6Time">--</b></div><div>実績：<b id="achievementCount">0</b>/6</div></div><div id="achievementList" class="achievement-list"></div><button id="closeRecords">閉じる</button></div>
     <div id="customPanel" class="custom-panel" style="display:none"><b>猫のカスタマイズ</b><p id="skinHint">成長や収集で衣装が解放されます</p><div><button data-skin="normal">通常</button><button data-skin="gold">ゴールド</button><button data-skin="night">夜色</button><button data-skin="ribbon">リボン</button><button data-skin="royal">王冠</button></div><button id="closeCustom">閉じる</button></div><div id="collectionPanel" class="custom-panel collection-panel" style="display:none"><b>📚 ねこコレクション</b><div id="collectionDetails"></div><button id="closeCollection">閉じる</button></div>
+    <div id="challengePanel" class="custom-panel phase2-panel" style="display:none" aria-hidden="true"><b>⚡ チャレンジモード</b><p>通常ステージを特別ルールで攻略しよう</p><div class="challenge-grid"><button data-challenge="time">⏱ タイムアタック</button><button data-challenge="all">🐟 全アイテム</button><button data-challenge="nodamage">🛡 ノーダメージ</button><button data-challenge="jumps">🪽 ジャンプ制限</button><button data-challenge="noskill">🚫 スキル禁止</button><button data-challenge="reverse">↩ 逆向きルート</button></div><div id="challengeStatus">通常モード</div><button id="closeChallenge">閉じる</button></div>
+    <div id="worldMapPanel" class="custom-panel phase2-panel map-panel" style="display:none" aria-hidden="true"><b>🗺 ねこの冒険マップ</b><div class="world-map"><div class="map-row"><button data-map-stage="1">🏠<small>おうち</small></button><span>→</span><button data-map-stage="2">🌿<small>夜の庭</small></button><span>→</span><button data-map-stage="3">🌙<small>窓辺</small></button></div><div class="map-line">│　　└──────────┐</div><div class="map-row"><button data-map-stage="4">🌿<small>ねこの庭</small></button><span>→</span><button data-map-stage="5">🌙<small>夜のリビング</small></button><span>→</span><button data-map-stage="6">🧸<small>おもちゃの迷宮</small></button></div><div class="map-line">　　　　　　　　　　│</div><div class="map-row"><button data-map-stage="7">☔<small>雨のベランダ</small></button><span>→</span><button data-map-stage="8">🏚<small>屋根裏</small></button></div></div><div id="mapDetails" class="map-details"></div><button id="closeWorldMap">閉じる</button></div>
     <div id="overlay" class="overlay">
       <div class="panel title-panel">
         <div class="title-kicker">MY LITTLE ADVENTURE <span class="live-badge">★ PREMIUM EDITION</span></div>
         <div class="title-mark"><span>🐾</span><span>✦</span><span>🐾</span></div>
         <h1 id="overlayTitle">うちの猫ゲーム</h1>
         <div class="title-subtitle">ぼうけんの舞台は、いつものおうち。</div>
-        <p id="overlayText">お気に入りの猫と一緒に、6つのステージを冒険しよう。</p>
+        <p id="overlayText">お気に入りの猫と一緒に、8つのステージを冒険しよう。</p>
         <div class="title-divider"><i></i><span>WORLD SELECT</span><i></i></div>
         <div class="title-stage-grid">
           <button class="title-stage-card selected" id="titleStage1" data-title-stage="1"><span class="stage-number">01</span><strong>おうち</strong><small>昼のリビングを冒険</small><em>PLAYABLE</em></button>
           <button class="title-stage-card" id="titleStage2" data-title-stage="2"><span class="stage-number">02</span><strong>夜の庭</strong><small>月明かりとボス戦</small><em>PLAYABLE</em></button>
-          <button class="title-stage-card" id="titleStage3" data-title-stage="3"><span class="stage-number">03</span><strong>窓辺</strong><small>光と風の大冒険</small><em>PLAYABLE</em></button><button class="title-stage-card" id="titleStage4" data-title-stage="4"><span class="stage-number">04</span><strong>ねこの庭</strong><small>隠し道と自然を探索</small><em>NEW</em></button><button class="title-stage-card" id="titleStage5" data-title-stage="5"><span class="stage-number">05</span><strong>夜のリビング</strong><small>暗闇・ライト・時間制</small><em>NEW</em></button><button class="title-stage-card" id="titleStage6" data-title-stage="6"><span class="stage-number">06</span><strong>おもちゃの迷宮</strong><small>スイッチ・扉・ワープ</small><em>NEW</em></button>
+          <button class="title-stage-card" id="titleStage3" data-title-stage="3"><span class="stage-number">03</span><strong>窓辺</strong><small>光と風の大冒険</small><em>PLAYABLE</em></button><button class="title-stage-card" id="titleStage4" data-title-stage="4"><span class="stage-number">04</span><strong>ねこの庭</strong><small>隠し道と自然を探索</small><em>NEW</em></button><button class="title-stage-card" id="titleStage5" data-title-stage="5"><span class="stage-number">05</span><strong>夜のリビング</strong><small>暗闇・ライト・時間制</small><em>NEW</em></button><button class="title-stage-card" id="titleStage6" data-title-stage="6"><span class="stage-number">06</span><strong>おもちゃの迷宮</strong><small>スイッチ・扉・ワープ</small><em>NEW</em></button><button class="title-stage-card" id="titleStage7" data-title-stage="7"><span class="stage-number">07</span><strong>雨のベランダ</strong><small>雨・水たまり・風船</small><em>NEW</em></button><button class="title-stage-card" id="titleStage8" data-title-stage="8"><span class="stage-number">08</span><strong>屋根裏の秘密基地</strong><small>梯子・隠し部屋・秘密通路</small><em>NEW</em></button>
         </div>
+        <div id="phase2QuickInfo" class="phase2-quick-info">⚡ チャレンジモード　　🗺 ワールドマップ　　👑 新ステージ7・8</div>
         <button id="startBtn" class="primary-start">ゲームスタート <span>▶</span></button>
-        <div class="title-hint">← → 移動　/　Space ジャンプ　/　Shift ダッシュ</div><div class="title-footer">SAVE DATA AUTO-SAVED　•　VERSION 4.9</div>
+        <div class="title-hint">← → 移動　/　Space ジャンプ　/　Shift ダッシュ</div><div class="title-footer">SAVE DATA AUTO-SAVED　•　VERSION 5.3 PHASE 2</div>
       </div>
     </div>
   </main>
@@ -52,7 +55,7 @@
   <div class="controls"><button data-key="left">◀</button><button data-key="jump">⬆ ジャンプ</button><button data-key="right">▶</button><button data-key="dash">💨</button><button id="pauseBtn">⏸ 一時停止</button><button id="collectionBtn">📖 図鑑</button><button id="helpBtn">❓ 操作説明</button></div>
   <footer><span id="saveNotice">記録はブラウザに自動保存されます</span><br>PC：← → 移動 / Space ジャンプ / Shift ダッシュ / P 一時停止 / C 図鑑<br>スマホ：画面下のボタン</footer>
 </div>
-<script src="script.js?v=4.9"></script>
+<script src="script.js?v=5.3"></script>
 <script>
 (function(){
   const cards=[...document.querySelectorAll('[data-title-stage]')];

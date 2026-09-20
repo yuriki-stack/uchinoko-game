@@ -155,7 +155,7 @@ function phase2StageReset(n){
     obstacles=[{x:210,y:435,w:45,h:20},{x:380,y:435,w:48,h:20},{x:610,y:435,w:50,h:20},{x:850,y:435,w:48,h:20},{x:1110,y:435,w:52,h:20},{x:1370,y:435,w:50,h:20}];
     jumpPads=[{x:270,y:438,w:58,h:17,power:15},{x:540,y:438,w:58,h:17,power:16},{x:920,y:438,w:58,h:17,power:17},{x:1220,y:438,w:58,h:17,power:18}];
     platforms=[{x:180,y:350,w:120,h:16,kind:"attic"},{x:340,y:285,w:110,h:16,kind:"attic"},{x:500,y:220,w:115,h:16,kind:"attic"},{x:680,y:320,w:130,h:16,kind:"attic"},{x:860,y:255,w:120,h:16,kind:"attic"},{x:1040,y:195,w:125,h:16,kind:"attic"},{x:1210,y:300,w:120,h:16,kind:"attic"},{x:1390,y:245,w:135,h:16,kind:"attic"}];
-    enemies=[{x:470,y:405,w:38,h:38,vx:1.1,alive:true},{x:800,y:405,w:38,h:38,vx:-1.2,alive:true},{x:1160,y:405,w:38,h:38,vx:1.3,alive:true}]; goalX=1580; phase2Boss={x:1490,y:350,w:76,h:105,hp:4,maxHp:4,vx:-1,active:true}; atticSecret=false;
+    enemies=[{x:470,y:405,w:38,h:38,vx:1.1,alive:true},{x:800,y:405,w:38,h:38,vx:-1.2,alive:true},{x:1160,y:405,w:38,h:38,vx:1.3,alive:true}]; goalX=1660; phase2Boss={x:1460,y:350,w:76,h:105,hp:4,maxHp:4,vx:-1,active:true}; atticSecret=false;
     phase2Puddles=[]; phase2Balloons=[]; phase2Shelters=[];
     phase2Ladders=[{x:300,y:285,w:38,h:170,topY:285,bottomY:455,label:'LADDER A'},{x:680,y:285,w:38,h:170,topY:285,bottomY:455,label:'LADDER B'},{x:1090,y:195,w:38,h:260,topY:195,bottomY:455,label:'LADDER C'}];
     phase2SecretPassages=[{x:720,y:255,w:110,h:70,toX:1110,toY:175,label:'SECRET'},{x:1180,y:235,w:100,h:70,toX:1380,toY:145,label:'HIDDEN PATH'}];
@@ -201,7 +201,7 @@ update=function(dt){
   if(stage===8){
     for(const l of phase2Ladders){if(p.x+p.w>l.x&&p.x<l.x+l.w&&p.y+p.h>l.topY-4&&p.y<l.bottomY){if(keys.ArrowUp||keys.up){p.y=Math.max(l.topY,p.y-3*dt);p.vy=0;p.onGround=false;p.jumps=0;notice='梯子を登っている…';noticeTime=18;}else if(keys.ArrowDown){p.y=Math.min(l.bottomY-p.h,p.y+3*dt);p.vy=0;}}}
     for(const z of phase2SecretPassages){if(!atticSecret&&p.x+p.w>z.x&&p.x<z.x+z.w&&p.y+p.h>z.y&&p.y<z.y+z.h){atticSecret=true;add(600);stats.totalItems++;updateUnlocks();p.x=z.toX;p.y=z.toY;notice='✨ 隠し部屋を発見！ 秘密のコレクション +600';noticeTime=120;beep(1120,.16);}}
-    if(phase2Boss&&phase2Boss.active){phase2Boss.x+=phase2Boss.vx*dt;if(phase2Boss.x<1360||phase2Boss.x>1510)phase2Boss.vx*=-1;if(p.x+p.w>phase2Boss.x&&p.x<phase2Boss.x+phase2Boss.w&&p.y+p.h>phase2Boss.y&&p.y<phase2Boss.y+phase2Boss.h){if(p.vy>1&&p.y+p.h<phase2Boss.y+20){phase2Boss.hp--;p.vy=-8;add(300);notice='暴走おもちゃを止めた！';noticeTime=55;if(phase2Boss.hp<=0){phase2Boss.active=false;notice='秘密基地のボスを撃破！';noticeTime=110;beep(980,.18)}}else damage()}}
+    if(phase2Boss&&phase2Boss.active){phase2Boss.x+=phase2Boss.vx*dt;if(phase2Boss.x<1370||phase2Boss.x>1510)phase2Boss.vx*=-1;if(p.x+p.w>phase2Boss.x&&p.x<phase2Boss.x+phase2Boss.w&&p.y+p.h>phase2Boss.y&&p.y<phase2Boss.y+phase2Boss.h){if(p.vy>1&&p.y+p.h<phase2Boss.y+20){phase2Boss.hp--;p.vy=-8;add(300);notice='暴走おもちゃを止めた！';noticeTime=55;if(phase2Boss.hp<=0){phase2Boss.active=false;notice='秘密基地のボスを撃破！';noticeTime=110;beep(980,.18)}}else damage()}}
     if(!phase2Boss.active&&p.x>=goalX-20)clear();
   }
   if(challengeMode?.key==='jumps'&&challengeJumps>challengeDefs.jumps.limit){notice="ジャンプ制限オーバー！";noticeTime=50;}
@@ -482,6 +482,58 @@ clear=function(){
 const draw56Base=draw;
 draw=function(dt=1){
   draw56Base(dt);
+  // Version 5.7: Stage 8 boss room visibility / navigation upgrade.
+  if(stage===8){
+    ctx.save();
+    // Boss direction indicator: always visible while the boss is alive.
+    if(phase2Boss && phase2Boss.active){
+      const bossScreenX=phase2Boss.x-cameraX;
+      const visible=bossScreenX>-40 && bossScreenX<W+40;
+      if(!visible){
+        const rightSide=phase2Boss.x>p.x;
+        const label=rightSide?'▶ ボスはこちら':'◀ ボスはこちら';
+        ctx.fillStyle='rgba(55,40,30,.88)';
+        ctx.fillRect(W/2-130,82,260,42);
+        ctx.fillStyle='#ffd85a';
+        ctx.font='bold 18px sans-serif';
+        ctx.textAlign='center';
+        ctx.fillText(label,W/2,109);
+      }
+    }
+    // Clear boss-room framing near the final area.
+    const roomX=1280, roomW=300;
+    ctx.save();
+    ctx.translate(-cameraX,0);
+    ctx.fillStyle='rgba(62,43,30,.28)';
+    ctx.fillRect(roomX,120,roomW,335);
+    ctx.fillStyle='rgba(255,225,130,.13)';
+    ctx.fillRect(roomX+28,155,roomW-56,260);
+    ctx.strokeStyle='#c28b4d'; ctx.lineWidth=8;
+    ctx.strokeRect(roomX+10,130,roomW-20,320);
+    ctx.fillStyle='#5a3928'; ctx.font='bold 20px sans-serif'; ctx.textAlign='center';
+    ctx.fillText('🧸 BOSS ROOM',roomX+roomW/2,158);
+    if(phase2Boss && phase2Boss.active){
+      const b=phase2Boss;
+      ctx.fillStyle='#8b5a70';
+      ctx.beginPath(); ctx.roundRect(b.x,b.y,b.w,b.h,18); ctx.fill();
+      ctx.fillStyle='#f7d36b';
+      ctx.beginPath(); ctx.arc(b.x+20,b.y+25,8,0,Math.PI*2); ctx.arc(b.x+b.w-20,b.y+25,8,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#3d2a38';
+      ctx.beginPath(); ctx.arc(b.x+22,b.y+38,5,0,Math.PI*2); ctx.arc(b.x+b.w-22,b.y+38,5,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#fff'; ctx.font='bold 14px sans-serif'; ctx.textAlign='center';
+      ctx.fillText('暴走おもちゃ',b.x+b.w/2,b.y-28);
+      ctx.fillStyle='#4b2830'; ctx.fillRect(b.x,b.y-16,b.w,8);
+      ctx.fillStyle='#f06b7a'; ctx.fillRect(b.x,b.y-16,b.w*Math.max(0,b.hp/b.maxHp),8);
+    }else{
+      ctx.fillStyle='#ffe27a'; ctx.font='bold 18px sans-serif'; ctx.fillText('BOSS DEFEATED!',roomX+roomW/2,225);
+    }
+    // Gate before the boss room makes the destination readable.
+    ctx.fillStyle='#9a6b42'; ctx.fillRect(1260,300,18,155);
+    ctx.fillStyle='#ffd85a'; ctx.fillRect(1230,260,78,35);
+    ctx.fillStyle='#5a3928'; ctx.font='bold 14px sans-serif'; ctx.fillText('BOSS',1269,283);
+    ctx.restore();
+    ctx.restore();
+  }
   if(stage>=7 && phase2Boss){
     ctx.save();
     const bx=Math.max(18, Math.min(W-218, phase2Boss.x-cameraX));

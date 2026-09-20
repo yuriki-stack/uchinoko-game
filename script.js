@@ -267,6 +267,200 @@ $('worldMapBtn').onclick=()=>{renderMap();$('worldMapPanel').style.display='flex
 (function(){const panel=$('recordsPanel');if(panel){const grid=panel.querySelector('.record-grid');grid.insertAdjacentHTML('beforeend','<div>ステージ7最高：<b id="stage7Best">0</b>点</div><div>ステージ7最速：<b id="stage7Time">--</b></div><div>ステージ8最高：<b id="stage8Best">0</b>点</div><div>ステージ8最速：<b id="stage8Time">--</b></div>');}})();
 
 
+
+
+// ==================== Version 5.5: Challenge Mode Complete ====================
+// Challenge selections are kept separate from the normal stage state so reset/start
+// cannot accidentally cancel a selected challenge.
+let pendingChallenge=null;
+let challengeReverseReached=false;
+let challengeMaxX=0;
+
+const challengeDefs55={
+  time:{name:"タイムアタック",desc:"90秒以内にクリア",limit:90,icon:"⏱"},
+  all:{name:"全アイテム回収",desc:"ステージ内のアイテムをすべて集める",limit:0,icon:"🐟"},
+  nodamage:{name:"ノーダメージ",desc:"一度もダメージを受けずにクリア",limit:0,icon:"🛡"},
+  jumps:{name:"ジャンプ制限",desc:"ジャンプ12回以内でクリア",limit:12,icon:"🪽"},
+  noskill:{name:"スキル禁止",desc:"にゃんこスキルを使わずにクリア",limit:0,icon:"🚫"},
+  reverse:{name:"逆向きルート",desc:"奥まで進んでから引き返す特殊ルートを攻略",limit:0,icon:"↩"}
+};
+Object.assign(challengeDefs,challengeDefs55);
+
+// Re-apply a selected challenge after the legacy reset routine finishes.
+const reset55Base=reset;
+reset=function(n=stage){
+  reset55Base(n);
+  challengeJumps=0;
+  challengeReverseReached=false;
+  challengeMaxX=p.x;
+  if(pendingChallenge){
+    challengeMode={key:pendingChallenge.key,name:pendingChallenge.name,usedSkill:false};
+    notice=challengeDefs55[pendingChallenge.key].icon+' '+challengeDefs55[pendingChallenge.key].name+' 開始！';
+    noticeTime=85;
+  }else{
+    challengeMode=null;
+  }
+};
+
+// Track progress needed by the reverse-route challenge.
+const update55Base=update;
+update=function(dt){
+  update55Base(dt);
+  if(!running||paused)return;
+  if(challengeMode){
+    challengeMaxX=Math.max(challengeMaxX,p.x);
+    if(challengeMode.key==='reverse' && challengeMaxX>=goalX*.62 && p.x<=challengeMaxX-220){
+      challengeReverseReached=true;
+    }
+  }
+};
+
+// Make the reverse challenge an actual route requirement.
+const clear55Base=clear;
+clear=function(){
+  if(challengeMode?.key==='reverse' && !challengeReverseReached){
+    notice='↩ いったん奥まで進んでから引き返そう！';
+    noticeTime=95;
+    beep(180,.12);
+    return;
+  }
+  clear55Base();
+  if(!running){ pendingChallenge=null; }
+};
+
+// Challenge-specific start flow. Selecting a challenge opens a clear confirmation
+// screen; the normal stage Start button then launches the selected ruleset.
+function beginChallengeSelection(key){
+  const def=challengeDefs55[key];
+  if(!def)return;
+  pendingChallenge={key,name:def.name};
+  const targetStage=stage;
+  const extra=targetStage>=7?'（ステージ7・8にも対応）':'';
+  show('⚡ '+def.name,
+    'ステージ'+targetStage+'：'+def.desc+extra+'\n'+(key==='time'?'制限時間：90秒':key==='jumps'?'最大ジャンプ：12回':'特別報酬：+500点'),
+    'チャレンジ開始');
+  $('challengeStatus').textContent='選択中：ステージ'+targetStage+' / '+def.name;
+}
+
+document.querySelectorAll('[data-challenge]').forEach(btn=>{
+  btn.onclick=()=>beginChallengeSelection(btn.dataset.challenge);
+});
+
+// The legacy start handler is replaced so pendingChallenge is applied by reset().
+$('startBtn').onclick=()=>{
+  stats.plays++;
+  saveStats();
+  keys={};
+  reset(stage);
+  running=true;
+  paused=false;
+  const mode=challengeMode;
+  notice=mode?'⚡ '+mode.name+' START!':'STAGE '+stage+' START!';
+  noticeTime=100;
+  hide();
+  last=performance.now();
+};
+
+// Normal stage selection cancels any previously selected challenge.
+function cancelPendingChallenge(){pendingChallenge=null;challengeMode=null;challengeReverseReached=false;}
+['stage1Btn','stage2Btn','stage3Btn','stage4Btn','stage5Btn','stage6Btn','stage7Btn','stage8Btn'].forEach(id=>{
+  const b=$(id);
+  if(!b)return;
+  b.addEventListener('click',cancelPendingChallenge,true);
+});
+
+// A challenge cannot remain armed after a game over/clear result.
+const over55Base=over;
+over=function(){pendingChallenge=null;challengeMode=null;challengeReverseReached=false;over55Base();};
+
+// Challenge status in the HUD.
+const updateUI55Base=updateUI;
+updateUI=function(){
+  updateUI55Base();
+  const old=$('challengeHud');
+  if(challengeMode){
+    if(!old){
+      const el=document.createElement('div');
+      el.id='challengeHud';
+      el.className='challenge-hud';
+      document.querySelector('.hud')?.appendChild(el);
+    }
+    const def=challengeDefs55[challengeMode.key];
+    let detail=def.name;
+    if(challengeMode.key==='time')detail+=' '+Math.max(0,def.limit-(performance.now()-stats.stageStart)/1000).toFixed(1)+'秒';
+    if(challengeMode.key==='jumps')detail+=' '+Math.min(challengeJumps,def.limit)+'/'+def.limit+'回';
+    if(challengeMode.key==='all')detail+=' '+(items.filter(i=>i.got).length)+'/'+items.length;
+    $('challengeHud').textContent='⚡ '+detail;
+  }else if(old){old.remove();}
+};
+
+// Add challenge completion history to the records screen.
+function challengeCount55(){
+  return Object.keys(stats.achievements).filter(k=>k.startsWith('challenge_')).length;
+}
+(function addChallengeRecord55(){
+  const panel=$('recordsPanel');
+  if(panel && !$('challengeRecord55')){
+    const el=document.createElement('div');
+    el.id='challengeRecord55';
+    el.className='challenge-record';
+    el.innerHTML='<span>⚡ チャレンジ達成</span><b>0</b>件';
+    panel.querySelector('.record-grid')?.appendChild(el);
+  }
+})();
+const updateRecordsUI55Base=updateRecordsUI;
+updateRecordsUI=function(){
+  updateRecordsUI55Base();
+  const el=$('challengeRecord55');
+  if(el)el.innerHTML='<span>⚡ チャレンジ達成</span><b>'+challengeCount55()+'</b>件';
+};
+
+// Improve the challenge panel with current-stage guidance.
+(function enhanceChallengePanel55(){
+  const panel=$('challengePanel');
+  if(!panel||$('challengeStageHint55'))return;
+  const hint=document.createElement('div');
+  hint.id='challengeStageHint55';
+  hint.className='challenge-stage-hint';
+  hint.textContent='現在のステージ：'+stage+'　まずステージを選択してからチャレンジを選ぼう';
+  panel.insertBefore(hint,panel.querySelector('.challenge-grid'));
+})();
+const openChallenge55=()=>{
+  $('challengeStageHint55').textContent='現在のステージ：'+stage+'　このステージに挑戦するルールを選択';
+  $('challengeStatus').textContent=pendingChallenge?'選択中：'+pendingChallenge.name:'通常モード';
+  $('challengePanel').style.display='flex';
+  $('challengePanel').setAttribute('aria-hidden','false');
+};
+$('challengeBtn').onclick=openChallenge55;
+
+// Draw a compact rules banner without interfering with gameplay.
+const draw55Base=draw;
+draw=function(dt=1){
+  draw55Base(dt);
+  if(challengeMode){
+    ctx.save();
+    ctx.fillStyle='rgba(42,36,52,.78)';
+    ctx.fillRect(W-285,12,270,42);
+    ctx.fillStyle='#fff';
+    ctx.font='bold 14px sans-serif';
+    ctx.textAlign='left';
+    const def=challengeDefs55[challengeMode.key];
+    ctx.fillText('⚡ '+def.name, W-270,30);
+    ctx.font='11px sans-serif';
+    let line=def.desc;
+    if(challengeMode.key==='time')line='残り '+Math.max(0,def.limit-(performance.now()-stats.stageStart)/1000).toFixed(1)+'秒';
+    if(challengeMode.key==='jumps')line='ジャンプ '+challengeJumps+'/'+def.limit;
+    if(challengeMode.key==='all')line='回収 '+items.filter(i=>i.got).length+'/'+items.length;
+    if(challengeMode.key==='reverse')line=challengeReverseReached?'逆向きルート達成！':'奥まで進んでから引き返す';
+    ctx.fillText(line,W-270,46);
+    ctx.restore();
+  }
+};
+
+// Persist the latest challenge-aware UI state.
+updateRecordsUI();
+updateUI();
+
 // Version 5.3.1 stability patch: always keep the world rendered behind menus.
 /* v5.3.2: use the browser's native page scrolling; no wheel interception. */
 if(!window.__uchinokoLoopStarted){window.__uchinokoLoopStarted=true;requestAnimationFrame(loop);}

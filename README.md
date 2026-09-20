@@ -20,3 +20,11 @@ Phase 2「ステージ7・8 完成度アップ」
 - 暴走おもちゃの大型ギミック
 
 Version 5.3.2の安定性修正をベースにしています。
+
+
+## Version 5.6
+- Stage 8 unlock bug fixed: Stage 7 clear record or clear achievement now unlocks Stage 8.
+- Stage 7 giant rain-balloon boss presentation upgraded with a visible HP bar and battle guidance.
+- Stage 8 runaway-toy boss presentation upgraded with a visible HP bar and battle guidance.
+- Stage 7/8 clear achievements are now recorded reliably.
+- Existing 5.3.2 rendering stability, 5.4.1 Stage 7 collision fixes, and 5.5 challenge mode are preserved.

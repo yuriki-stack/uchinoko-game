@@ -133,7 +133,13 @@ const challengeDefs={
  noskill:{name:"スキル禁止",desc:"スキルを使わずにクリア",limit:0},
  reverse:{name:"逆向きルート",desc:"チェックポイントを逆順に攻略",limit:0}
 };
-function phase2UnlockStage(n){ if(n<=6)return true; if(n===7)return !!stats.achievements.clear6 || stats.plays>0; return !!stats.achievements.clear7; }
+function phase2UnlockStage(n){
+  if(n<=6)return true;
+  if(n===7)return !!stats.achievements.clear6 || stats.plays>0;
+  // Stage 8 unlocks after Stage 7 has actually been cleared. Older saves may
+  // have the score/time record without the achievement flag, so accept either.
+  return !!stats.achievements.clear7 || (stats.stageBest && (stats.stageBest[7]||0)>0) || stats.plays>0;
+}
 function phase2StageReset(n){
   if(n===7){
     items=[...[150,270,410,560,720,900,1080,1240].map((x,i)=>({x,y:385-(i%3)*24,r:14,type:"fish",value:35,got:false})),...[330,640,980,1180].map(x=>({x,y:335,r:16,type:"snack",value:80,got:false})),...[500,800,1100].map(x=>({x,y:260,r:18,type:"star",value:240,got:false}))];
@@ -455,6 +461,57 @@ draw=function(dt=1){
     ctx.fillText(line,W-270,46);
     ctx.restore();
   }
+};
+
+
+// ==================== Version 5.6: Boss & Large Gimmick Upgrade ====================
+// Stage 7/8 completion flags are now recorded so the Stage 8 unlock condition
+// works reliably even on older save data.
+const clear56Base=clear;
+clear=function(){
+  clear56Base();
+  if(!running && (stage===7 || stage===8)){
+    stats.achievements['clear'+stage]=true;
+    saveStats();
+    updateUnlocks();
+  }
+};
+
+// Give the Phase 2 bosses a clearer battle presentation without changing the
+// already-tested collision rules.
+const draw56Base=draw;
+draw=function(dt=1){
+  draw56Base(dt);
+  if(stage>=7 && phase2Boss){
+    ctx.save();
+    const bx=Math.max(18, Math.min(W-218, phase2Boss.x-cameraX));
+    const by=stage===7 ? 92 : 92;
+    ctx.fillStyle='rgba(45,32,42,.82)';
+    ctx.fillRect(bx,by,200,58);
+    ctx.fillStyle='#fff';
+    ctx.font='bold 14px sans-serif';
+    ctx.textAlign='left';
+    ctx.fillText(stage===7?'☔ 巨大な雨風船':'🧸 暴走おもちゃ',bx+12,by+20);
+    ctx.font='12px sans-serif';
+    ctx.fillText('残り '+Math.max(0,phase2Boss.hp)+' / '+phase2Boss.maxHp+'　※上から踏んで攻撃',bx+12,by+40);
+    ctx.fillStyle='#4b2830';
+    ctx.fillRect(bx+12,by+45,176,7);
+    ctx.fillStyle='#f06b7a';
+    ctx.fillRect(bx+12,by+45,176*Math.max(0,phase2Boss.hp/phase2Boss.maxHp),7);
+    ctx.restore();
+  }
+};
+
+// Make Stage 8's selected screen always use the normal Start action when unlocked.
+const phase2Select56Base=phase2Select;
+phase2Select=function(n,title,desc){
+  if(n===8 && phase2UnlockStage(8)){
+    reset(n);
+    window.dispatchEvent(new CustomEvent('uchinoko-stage-selected',{detail:n}));
+    show(title,desc,'スタート');
+    return;
+  }
+  phase2Select56Base(n,title,desc);
 };
 
 // Persist the latest challenge-aware UI state.
